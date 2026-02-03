@@ -1,0 +1,43 @@
+Okaro Property Management System - Quick Links
+==============================================
+
+Base URL: http://localhost:8000
+
+Authentication
+--------------
+Login:              /login
+Register (Public):  /register
+Register (Admin):   /register-admin
+
+Dashboard
+---------
+Main Dashboard:     /dashboard
+
+Properties
+----------
+Buildings List:     /buildings
+Add Building:       /buildings/create
+Units List:         /units
+Add Unit:           /units/create
+
+Tenancy
+-------
+Tenants List:       /tenants
+Add Tenant:         /tenants/create
+Rents/Leases:       /rents
+Create Lease:       /rents/create
+
+Finance
+-------
+Payments List:      /payments
+Record Payment:     /payments/create
+
+Maintenance
+-----------
+All Requests:       /maintenance
+New Request:        /maintenance/create
+
+Administration
+--------------
+User Management:    /users
+Role Management:    /roles

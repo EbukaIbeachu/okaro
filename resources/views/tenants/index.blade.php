@@ -1,0 +1,128 @@
+@extends('layouts.app')
+
+@section('content')
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+    <h1 class="h2" id="tenants-header">Tenants</h1>
+    <div class="btn-toolbar mb-2 mb-md-0">
+        <button class="btn btn-sm btn-outline-info me-2" onclick="startTour()">
+            <i class="bi bi-question-circle"></i> Help
+        </button>
+        <a href="{{ route('tenants.create') }}" class="btn btn-sm btn-primary" id="add-tenant-btn">
+            <i class="bi bi-plus-lg"></i> Register Tenant
+        </a>
+    </div>
+</div>
+
+<div class="card shadow-sm">
+    <div class="card-body">
+        <div class="mb-3">
+            <input type="text" id="tenantSearch" class="form-control" placeholder="Search tenants...">
+        </div>
+        <div class="table-responsive">
+            <table class="table table-striped table-hover align-middle" id="tenantsTable">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Unit</th>
+                        <th>Contact</th>
+                        <th>Move In</th>
+                        @if(Auth::user()->isAdmin())
+                        <th>Created By</th>
+                        @endif
+                        <th>Status</th>
+                        <th class="text-end">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @forelse($tenants as $tenant)
+                    <tr>
+                        <td>
+                            <a href="{{ route('tenants.show', $tenant) }}" class="text-decoration-none fw-bold">
+                                {{ $tenant->full_name }}
+                            </a>
+                        </td>
+                        <td>
+                            @if($tenant->unit)
+                                <a href="{{ route('units.show', $tenant->unit) }}" class="text-decoration-none text-dark">
+                                    {{ $tenant->unit->unit_number }}
+                                </a>
+                                <br>
+                                <small class="text-muted">{{ $tenant->unit->building->name }}</small>
+                            @else
+                                <span class="text-muted fst-italic">No Unit Assigned</span>
+                            @endif
+                        </td>
+                        <td>
+                            @if($tenant->email)
+                                <div><i class="bi bi-envelope me-1 text-muted"></i> {{ $tenant->email }}</div>
+                            @endif
+                            @if($tenant->phone)
+                                <div><i class="bi bi-telephone me-1 text-muted"></i> {{ $tenant->phone }}</div>
+                            @endif
+                        </td>
+                        <td>{{ $tenant->move_in_date }}</td>
+                        @if(Auth::user()->isAdmin())
+                        <td>
+                            @if($tenant->creator)
+                                <div class="d-flex align-items-center">
+                                    <div class="ms-2">
+                                        <div class="fw-bold small">{{ $tenant->creator->name }}</div>
+                                        <div class="text-muted" style="font-size: 0.75rem;">{{ $tenant->creator->role->name ?? 'User' }}</div>
+                                    </div>
+                                </div>
+                            @else
+                                <span class="text-muted small fst-italic">System</span>
+                            @endif
+                        </td>
+                        @endif
+                        <td>
+                            @if($tenant->active)
+                                <span class="badge bg-success">Active</span>
+                            @else
+                                <span class="badge bg-secondary">Inactive</span>
+                            @endif
+                        </td>
+                        <td class="text-end">
+                            <div class="btn-group">
+                                <a href="{{ route('tenants.show', $tenant) }}" class="btn btn-sm btn-outline-secondary" title="View">
+                                    <i class="bi bi-eye"></i>
+                                </a>
+                                <a href="{{ route('tenants.edit', $tenant) }}" class="btn btn-sm btn-outline-primary" title="Edit">
+                                    <i class="bi bi-pencil"></i>
+                                </a>
+                                <form action="{{ route('tenants.destroy', $tenant) }}" method="POST" class="d-inline" onsubmit="return confirm('Are you sure you want to delete this tenant?');">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" class="btn btn-sm btn-outline-danger" title="Delete">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                    @empty
+                    <tr>
+                        <td colspan="6" class="text-center py-4 text-muted">
+                            <i class="bi bi-people fs-1 d-block mb-2"></i>
+                            No tenants found. Click "Register Tenant" to add one.
+                        </td>
+                    </tr>
+                    @endforelse
+                </tbody>
+            </table>
+        </div>
+        
+        <div class="mt-3">
+            {{ $tenants->links() }}
+        </div>
+    </div>
+</div>
+
+@push('scripts')
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        setupTableSearch('tenantSearch', 'tenantsTable');
+    });
+</script>
+@endpush
+@endsection

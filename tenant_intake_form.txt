@@ -1,0 +1,82 @@
+Okaro Property Management - Tenant Intake Form
+============================================
+INSTRUCTIONS FOR TENANT:
+Please fill out this form completely. This information will be used to set up your profile and lease agreement in our system.
+
+--------------------------------------------------------------------------------
+SECTION 1: PERSONAL INFORMATION
+--------------------------------------------------------------------------------
+
+Full Name: 
+__________________________________________________________________________
+(First, Middle, Last)
+
+Phone Number: 
+__________________________________________________________________________
+
+Email Address: 
+__________________________________________________________________________
+(Used for system login and notifications)
+
+Move-In Date: 
+________ / ________ / ________ (DD/MM/YYYY)
+
+Profile Photo: 
+[ ] Included with form (Digital or Physical)
+
+--------------------------------------------------------------------------------
+SECTION 2: UNIT & RESIDENCE DETAILS
+--------------------------------------------------------------------------------
+
+Building Name/Address:
+__________________________________________________________________________
+
+Unit / Apartment Number:
+__________________________________________________________________________
+
+Room Number (if applicable):
+__________________________________________________________________________
+
+--------------------------------------------------------------------------------
+SECTION 3: LEASE AGREEMENT DETAILS (For Manager/Admin Use)
+--------------------------------------------------------------------------------
+
+Lease Start Date:
+________ / ________ / ________ (DD/MM/YYYY)
+
+Lease End Date:
+________ / ________ / ________ (DD/MM/YYYY)
+
+Rent Payment Frequency (Check one):
+[ ] Monthly   [ ] Quarterly   [ ] Annually
+
+Rent Amount:
+Amount: $__________________  per (Month/Year)
+
+IMPORTANT SYSTEM NOTE FOR ADMIN: 
+The system requires the 'Annual Amount' (Total Rent for the Year). 
+If the rent is monthly, multiply by 12 before entering into the 'Rents/Lease' section.
+
+Rent Due Day:
+Day of Month: ________ (1-28)
+
+Security Deposit Amount (if applicable):
+$__________________
+
+--------------------------------------------------------------------------------
+SECTION 4: EMERGENCY CONTACT
+--------------------------------------------------------------------------------
+
+Name: ____________________________________________________________________
+
+Relationship: _____________________________________________________________
+
+Phone: ____________________________________________________________________
+
+--------------------------------------------------------------------------------
+SIGNATURES
+--------------------------------------------------------------------------------
+
+Tenant Signature: __________________________________  Date: ______________
+
+Manager Signature: _________________________________  Date: ______________

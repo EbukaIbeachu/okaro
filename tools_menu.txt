@@ -1,0 +1,16 @@
+Okaro Site Tools
+
+1) Simple PHP Test
+http://okaroassociates.xo.je/simple_test.php
+
+2) Find Rogue Config Files
+http://okaroassociates.xo.je/find_files.php
+
+3) Cleanup Misplaced Vendors (deletes routes/vendor, database/vendor, resources/vendor)
+http://okaroassociates.xo.je/cleanup_vendor.php?confirm=yes
+
+4) Full Laravel Diagnostic
+http://okaroassociates.xo.je/debug.php
+
+5) Main Site (Home)
+http://okaroassociates.xo.je/

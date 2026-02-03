@@ -1,0 +1,86 @@
+Okaro Property Management System - Comprehensive Link List
+========================================================
+
+Base URL: http://localhost:8000
+(On Production: http://okaroassociates.xo.je)
+
+Public Pages
+------------
+Home/Welcome:         /
+Login:                /login
+Register (Public):    /register
+Register (Admin):     /register-admin
+
+Dashboard
+---------
+Main Dashboard:       /dashboard
+
+Property Management (Buildings & Units)
+---------------------------------------
+Buildings List:       /buildings
+Create Building:      /buildings/create
+Show Building:        /buildings/{id}      (e.g., /buildings/1)
+Edit Building:        /buildings/{id}/edit (e.g., /buildings/1/edit)
+
+Units List:           /units
+Create Unit:          /units/create
+Show Unit:            /units/{id}          (e.g., /units/1)
+Edit Unit:            /units/{id}/edit     (e.g., /units/1/edit)
+
+Tenancy Management
+------------------
+Tenants List:         /tenants
+Create Tenant:        /tenants/create
+Show Tenant:          /tenants/{id}
+Edit Tenant:          /tenants/{id}/edit
+
+Lease/Rent Management
+---------------------
+Rents List:           /rents
+Create Lease:         /rents/create
+Show Lease:           /rents/{id}
+Edit Lease:           /rents/{id}/edit
+Lease Agreement:      /rents/{id}/agreement
+Upload Agreement:     /rents/{id}/upload-agreement (POST)
+
+Financials
+----------
+Payments List:        /payments
+Record Payment:       /payments/create
+Show Payment:         /payments/{id}
+Edit Payment:         /payments/{id}/edit
+
+Maintenance
+-----------
+Requests List:        /maintenance
+New Request:          /maintenance/create
+Show Request:         /maintenance/{id}
+Edit Request:         /maintenance/{id}/edit
+
+Administration
+--------------
+User Management:      /users
+Create User:          /users/create
+Show User:            /users/{id}
+Edit User:            /users/{id}/edit
+Toggle User Status:   /users/{id}/toggle-status (POST)
+
+Role Management:      /roles
+Create Role:          /roles/create
+Show Role:            /roles/{id}
+Edit Role:            /roles/{id}/edit
+
+API Routes (Prefix: /api)
+-------------------------
+Login:                /api/login (POST)
+Logout:               /api/logout (POST, Auth: Sanctum)
+User Profile:         /api/user (GET, Auth: Sanctum)
+Tenant Dashboard:     /api/tenant/dashboard (GET, Auth: Sanctum)
+Tenant Payments:      /api/tenant/payments (GET, Auth: Sanctum)
+
+Authentication Actions (POST)
+-----------------------------
+Login Action:         /login
+Logout Action:        /logout
+Register Action:      /register
+Admin Register:       /register-admin

@@ -33,9 +33,6 @@
                                 </option>
                             @endforeach
                         </select>
-                        <div id="outstanding-alert" class="alert mt-2 d-none">
-                            <strong>Outstanding Due:</strong> ₦<span id="outstanding-amount">0.00</span>
-                        </div>
                         @error('rent_id')
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
@@ -54,15 +51,21 @@
                         </div>
 
                         <div class="col-md-6 mb-3">
+                            <label for="outstanding_display" class="form-label">Outstanding Due (₦)</label>
+                            <input type="text" class="form-control bg-light" id="outstanding_display" readonly value="0.00">
+                            <div class="form-text text-muted" id="remaining_hint"></div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
                             <label for="payment_date" class="form-label">Payment Date <span class="text-danger">*</span></label>
                             <input type="date" class="form-control @error('payment_date') is-invalid @enderror" id="payment_date" name="payment_date" value="{{ old('payment_date', date('Y-m-d')) }}" required>
                             @error('payment_date')
                                 <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
                         </div>
-                    </div>
 
-                    <div class="row">
                         <div class="col-md-6 mb-3">
                             <label for="payment_method" class="form-label">Payment Method</label>
                             <select class="form-select @error('payment_method') is-invalid @enderror" id="payment_method" name="payment_method">
@@ -93,39 +96,67 @@
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         const rentSelect = document.getElementById('rent_id');
-        const alertBox = document.getElementById('outstanding-alert');
-        const amountSpan = document.getElementById('outstanding-amount');
+        const outstandingInput = document.getElementById('outstanding_display');
+        const remainingHint = document.getElementById('remaining_hint');
+        const amountInput = document.getElementById('amount');
 
         function updateOutstanding() {
             const selectedOption = rentSelect.options[rentSelect.selectedIndex];
             if (!selectedOption || !selectedOption.value) {
-                alertBox.classList.add('d-none');
+                outstandingInput.value = "0.00";
+                remainingHint.textContent = "";
                 return;
             }
 
             const balance = parseFloat(selectedOption.getAttribute('data-balance'));
             
             if (!isNaN(balance)) {
-                alertBox.classList.remove('d-none');
-                alertBox.classList.remove('alert-success', 'alert-warning', 'alert-danger');
-
                 if (balance > 0) {
-                    amountSpan.textContent = balance.toLocaleString('en-NG', {minimumFractionDigits: 2});
-                    alertBox.classList.add('alert-warning');
-                    alertBox.querySelector('strong').textContent = 'Outstanding Due:';
+                    outstandingInput.value = balance.toFixed(2);
+                    outstandingInput.style.fontWeight = "bold";
+                    outstandingInput.style.color = "#dc3545"; // Bootstrap danger color
                 } else if (balance < 0) {
-                    amountSpan.textContent = Math.abs(balance).toLocaleString('en-NG', {minimumFractionDigits: 2});
-                    alertBox.classList.add('alert-success');
-                    alertBox.querySelector('strong').textContent = 'Credit Balance:';
+                    outstandingInput.value = Math.abs(balance).toFixed(2) + " (Credit)";
+                    outstandingInput.style.fontWeight = "bold";
+                    outstandingInput.style.color = "#198754"; // Bootstrap success color
                 } else {
-                    amountSpan.textContent = '0.00';
-                    alertBox.classList.add('alert-success');
-                    alertBox.querySelector('strong').textContent = 'All Caught Up:';
+                    outstandingInput.value = "0.00 (Caught Up)";
+                    outstandingInput.style.fontWeight = "bold";
+                    outstandingInput.style.color = "#198754";
                 }
+                updateRemaining();
+            }
+        }
+
+        function updateRemaining() {
+            const selectedOption = rentSelect.options[rentSelect.selectedIndex];
+            if (!selectedOption || !selectedOption.value) {
+                remainingHint.textContent = "";
+                return;
+            }
+
+            const balance = parseFloat(selectedOption.getAttribute('data-balance'));
+            const payingAmount = parseFloat(amountInput.value) || 0;
+
+            if (balance > 0) {
+                const remaining = balance - payingAmount;
+                if (remaining > 0) {
+                    remainingHint.innerHTML = "Remaining after payment: <strong>₦" + remaining.toLocaleString('en-NG', {minimumFractionDigits: 2}) + "</strong>";
+                    remainingHint.className = "form-text text-danger";
+                } else if (remaining < 0) {
+                    remainingHint.innerHTML = "New Credit Balance: <strong>₦" + Math.abs(remaining).toLocaleString('en-NG', {minimumFractionDigits: 2}) + "</strong>";
+                    remainingHint.className = "form-text text-success";
+                } else {
+                    remainingHint.innerHTML = "<strong>Fully Paid!</strong>";
+                    remainingHint.className = "form-text text-success";
+                }
+            } else {
+                remainingHint.textContent = "";
             }
         }
 
         rentSelect.addEventListener('change', updateOutstanding);
+        amountInput.addEventListener('input', updateRemaining);
         
         if (rentSelect.value) {
             updateOutstanding();

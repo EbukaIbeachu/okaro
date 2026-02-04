@@ -15,8 +15,14 @@
 
 <div class="card shadow-sm">
     <div class="card-body">
-        <div class="mb-3">
-            <input type="text" id="rentSearch" class="form-control" placeholder="Search agreements...">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <div class="btn-group">
+                <a href="{{ route('rents.index', ['status' => 'ACTIVE']) }}" class="btn btn-sm {{ $status === 'ACTIVE' ? 'btn-primary' : 'btn-outline-primary' }}">Active</a>
+                <a href="{{ route('rents.index', ['status' => 'EXPIRED']) }}" class="btn btn-sm {{ $status === 'EXPIRED' ? 'btn-primary' : 'btn-outline-primary' }}">Expired</a>
+                <a href="{{ route('rents.index', ['status' => 'TERMINATED']) }}" class="btn btn-sm {{ $status === 'TERMINATED' ? 'btn-primary' : 'btn-outline-primary' }}">Terminated</a>
+                <a href="{{ route('rents.index', ['status' => 'ALL']) }}" class="btn btn-sm {{ $status === 'ALL' ? 'btn-primary' : 'btn-outline-primary' }}">All</a>
+            </div>
+            <input type="text" id="rentSearch" class="form-control w-auto" placeholder="Search agreements...">
         </div>
         <div class="table-responsive">
             <table class="table table-striped table-hover align-middle" id="rentsTable">
@@ -85,6 +91,7 @@
                                 <a href="{{ route('rents.edit', $rent) }}" class="btn btn-sm btn-outline-primary" title="Edit">
                                     <i class="bi bi-pencil"></i>
                                 </a>
+                                @if(Auth::user()->isAdmin())
                                 <form action="{{ route('rents.destroy', $rent) }}" method="POST" class="d-inline" onsubmit="return confirm('Are you sure you want to delete this agreement?');">
                                     @csrf
                                     @method('DELETE')
@@ -92,6 +99,7 @@
                                         <i class="bi bi-trash"></i>
                                     </button>
                                 </form>
+                                @endif
                             </div>
                         </td>
                     </tr>

@@ -9,10 +9,18 @@ use Illuminate\Http\Request;
 
 class RentController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $rents = Rent::with(['tenant', 'unit.building', 'creator'])->paginate(15);
-        return view('rents.index', compact('rents'));
+        $status = $request->query('status', 'ACTIVE'); // Default to ACTIVE
+        
+        $query = Rent::with(['tenant', 'unit.building', 'creator']);
+
+        if ($status && $status !== 'ALL') {
+            $query->where('status', $status);
+        }
+
+        $rents = $query->paginate(15);
+        return view('rents.index', compact('rents', 'status'));
     }
 
     public function create(Request $request)
@@ -39,6 +47,21 @@ class RentController extends Controller
 
         if (isset($validated['end_date'])) {
             $validated['due_day'] = \Carbon\Carbon::parse($validated['end_date'])->day;
+        }
+
+        // Check for existing active lease for this tenant
+        $existingRent = Rent::where('tenant_id', $validated['tenant_id'])
+                            ->where('status', 'ACTIVE')
+                            ->first();
+
+        if ($existingRent) {
+            // Mark the old lease as EXPIRED
+            $existingRent->update(['status' => 'EXPIRED']);
+            
+            // If the tenant is moving to a new unit, free up the old unit
+            if ($existingRent->unit_id != $validated['unit_id']) {
+                $existingRent->unit->update(['status' => 'AVAILABLE']);
+            }
         }
 
         $rent = Rent::create($validated);
@@ -131,6 +154,10 @@ class RentController extends Controller
 
     public function destroy(Rent $rent)
     {
+        if (!auth()->user()->isAdmin()) {
+            return back()->with('error', 'Unauthorized action. Only admins can delete rental agreements.');
+        }
+
         if ($rent->payments()->exists()) {
             return back()->with('error', 'Cannot delete rental agreement with recorded payments.');
         }

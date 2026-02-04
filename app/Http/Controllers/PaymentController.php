@@ -78,6 +78,10 @@ class PaymentController extends Controller
 
     public function destroy(Payment $payment)
     {
+        if (!auth()->user()->isAdmin()) {
+            return back()->with('error', 'Unauthorized action. Only admins can delete payments.');
+        }
+
         $payment->delete();
         return redirect()->route('payments.index')->with('success', 'Payment deleted successfully.');
     }

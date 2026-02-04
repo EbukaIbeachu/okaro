@@ -77,6 +77,7 @@
                                 <a href="{{ route('payments.edit', $payment) }}" class="btn btn-sm btn-outline-primary" title="Edit">
                                     <i class="bi bi-pencil"></i>
                                 </a>
+                                @if(Auth::user()->isAdmin())
                                 <form action="{{ route('payments.destroy', $payment) }}" method="POST" class="d-inline" onsubmit="return confirm('Are you sure you want to delete this payment?');">
                                     @csrf
                                     @method('DELETE')
@@ -84,6 +85,7 @@
                                         <i class="bi bi-trash"></i>
                                     </button>
                                 </form>
+                                @endif
                             </div>
                         </td>
                     </tr>

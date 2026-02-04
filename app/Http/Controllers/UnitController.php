@@ -89,6 +89,10 @@ class UnitController extends Controller
 
     public function destroy(Unit $unit)
     {
+        if (!auth()->user()->isAdmin()) {
+            return back()->with('error', 'Unauthorized action. Only admins can delete units.');
+        }
+
         if ($unit->status === 'OCCUPIED') {
             return back()->with('error', 'Cannot delete an occupied unit.');
         }

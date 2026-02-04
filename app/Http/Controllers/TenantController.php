@@ -174,6 +174,10 @@ class TenantController extends Controller
 
     public function destroy(Tenant $tenant)
     {
+        if (!auth()->user()->isAdmin()) {
+            return back()->with('error', 'Unauthorized action. Only admins can delete tenants.');
+        }
+
         // Check for payments history
         if ($tenant->payments()->exists()) {
              return back()->with('error', 'Cannot delete tenant with payment history.');

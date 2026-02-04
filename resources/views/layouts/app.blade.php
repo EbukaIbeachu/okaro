@@ -199,7 +199,11 @@
             <button class="sidebar-toggle" id="sidebarToggleBtn" onclick="toggleSidebar()">
                 <i class="bi bi-list"></i>
             </button>
-            <span class="fw-bold fs-5 ms-3 text-primary"><i class="bi bi-building"></i> Okaro & Associates</span>
+            <div class="ms-3 fw-bold text-primary fs-5">
+                <a href="{{ url('/') }}" class="text-decoration-none text-primary">
+                    <i class="bi bi-building"></i> Okaro & Associates
+                </a>
+            </div>
         </div>
         @endauth
 
@@ -218,6 +222,11 @@
                 </div>
                 <div class="position-sticky pt-3">
                     <ul class="nav flex-column">
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url('/') }}">
+                                <i class="bi bi-house me-2"></i> Home
+                            </a>
+                        </li>
                         <li class="nav-item">
                             <a class="nav-link {{ request()->routeIs('dashboard') ? 'active' : '' }}" href="{{ route('dashboard') }}">
                                 <i class="bi bi-speedometer2 me-2"></i> Dashboard
@@ -325,7 +334,7 @@
                 </div>
 
                 <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom d-md-none">
-                    <h1 class="h2">Okaro</h1>
+                    <h1 class="h2 text-primary fw-bold">{{ Auth::user()->isAdmin() ? 'Admin' : (Auth::user()->isManager() ? 'Manager' : 'Tenant') }}</h1>
                 </div>
                 @endauth
 
@@ -583,5 +592,67 @@
         }
     </script>
     @stack('scripts')
+
+    <!-- Screensaver Overlay -->
+    <style>
+        #screensaver {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 9999;
+            background-image: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url('{{ asset("assets/images/hero-bg.jpg") }}');
+            background-size: cover;
+            background-position: center;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            text-align: center;
+            backdrop-filter: blur(5px);
+        }
+        #screensaver h1 {
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+        }
+    </style>
+    <div id="screensaver">
+        <div>
+            <h1 class="display-3 fw-bold">Okaro & Associates</h1>
+            <p class="lead fs-3">Property Management Simplified</p>
+            <p class="mt-4 opacity-75"><small><i class="bi bi-mouse me-2"></i>Move mouse or press any key to return</small></p>
+        </div>
+    </div>
+    <script>
+        (function() {
+            let inactivityTime = function () {
+                let time;
+                const screensaver = document.getElementById('screensaver');
+                
+                // Reset timer on activity
+                function resetTimer() {
+                    if (screensaver.style.display === 'flex') {
+                        screensaver.style.display = 'none';
+                    }
+                    clearTimeout(time);
+                    time = setTimeout(showScreensaver, 20000); // 20 seconds
+                }
+
+                function showScreensaver() {
+                    screensaver.style.display = 'flex';
+                }
+
+                // Events to monitor
+                const events = ['mousemove', 'keypress', 'touchstart', 'click', 'scroll'];
+                events.forEach(function(name) {
+                    document.addEventListener(name, resetTimer, true);
+                });
+                
+                resetTimer(); // Start timer on load
+            };
+
+            inactivityTime();
+        })();
+    </script>
 </body>
 </html>

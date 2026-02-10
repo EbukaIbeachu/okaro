@@ -1,6 +1,25 @@
 @extends('layouts.app')
 
 @section('content')
+<style>
+    @media (max-width: 767.98px) {
+        /* Force background color on cells to override Bootstrap's striped/hover styles */
+        .mobile-status-active, 
+        .mobile-status-active > td, 
+        .mobile-status-active > th { 
+            background-color: #d1e7dd !important; 
+            --bs-table-accent-bg: #d1e7dd !important;
+            --bs-table-bg: #d1e7dd !important;
+        }
+        .mobile-status-inactive, 
+        .mobile-status-inactive > td, 
+        .mobile-status-inactive > th { 
+            background-color: #e2e3e5 !important; 
+            --bs-table-accent-bg: #e2e3e5 !important;
+            --bs-table-bg: #e2e3e5 !important;
+        }
+    }
+</style>
 <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
     <h1 class="h2" id="tenants-header">Tenants</h1>
     <div class="btn-toolbar mb-2 mb-md-0">
@@ -24,18 +43,18 @@
                     <tr>
                         <th>Name</th>
                         <th>Unit</th>
-                        <th>Contact</th>
+                        <th class="d-none d-md-table-cell">Contact</th>
                         <th>Move In</th>
                         @if(Auth::user()->isAdmin())
                         <th>Created By</th>
                         @endif
-                        <th>Status</th>
+                        <th class="d-none d-md-table-cell">Status</th>
                         <th class="text-end">Actions</th>
                     </tr>
                 </thead>
                 <tbody>
                     @forelse($tenants as $tenant)
-                    <tr>
+                    <tr class="{{ $tenant->active ? 'mobile-status-active' : 'mobile-status-inactive' }}">
                         <td>
                             <a href="{{ route('tenants.show', $tenant) }}" class="text-decoration-none fw-bold">
                                 {{ $tenant->full_name }}
@@ -52,7 +71,7 @@
                                 <span class="text-muted fst-italic">No Unit Assigned</span>
                             @endif
                         </td>
-                        <td>
+                        <td class="d-none d-md-table-cell">
                             @if($tenant->email)
                                 <div><i class="bi bi-envelope me-1 text-muted"></i> {{ $tenant->email }}</div>
                             @endif
@@ -75,7 +94,7 @@
                             @endif
                         </td>
                         @endif
-                        <td>
+                        <td class="d-none d-md-table-cell">
                             @if($tenant->active)
                                 <span class="badge bg-success">Active</span>
                             @else

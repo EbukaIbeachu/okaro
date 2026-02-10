@@ -21,3 +21,12 @@ yarn-error.log
 /okaro_infinityfree_final
 /okaro_vendor_final
 /okaro_vendor_fixed
+
+# Laravel Storage
+/storage/framework/cache/data/*
+/storage/framework/sessions/*
+/storage/framework/testing/*
+/storage/framework/views/*
+/storage/logs/*
+!/storage/framework/views/.gitignore
+!/storage/logs/.gitignore

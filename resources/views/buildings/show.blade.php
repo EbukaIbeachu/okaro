@@ -1,6 +1,42 @@
 @extends('layouts.app')
 
 @section('content')
+<style>
+    @media (max-width: 767.98px) {
+        /* Force background color on cells to override Bootstrap's striped/hover styles */
+        .mobile-status-active, 
+        .mobile-status-active > td, 
+        .mobile-status-active > th,
+        .mobile-status-completed,
+        .mobile-status-completed > td,
+        .mobile-status-completed > th { 
+            background-color: #d1e7dd !important; 
+            --bs-table-accent-bg: #d1e7dd !important;
+            --bs-table-bg: #d1e7dd !important;
+        }
+        .mobile-status-inactive, 
+        .mobile-status-inactive > td, 
+        .mobile-status-inactive > th { 
+            background-color: #e2e3e5 !important; 
+            --bs-table-accent-bg: #e2e3e5 !important;
+            --bs-table-bg: #e2e3e5 !important;
+        }
+        .mobile-status-pending,
+        .mobile-status-pending > td,
+        .mobile-status-pending > th {
+            background-color: #fff3cd !important;
+            --bs-table-accent-bg: #fff3cd !important;
+            --bs-table-bg: #fff3cd !important;
+        }
+        .mobile-status-failed,
+        .mobile-status-failed > td,
+        .mobile-status-failed > th {
+            background-color: #f8d7da !important;
+            --bs-table-accent-bg: #f8d7da !important;
+            --bs-table-bg: #f8d7da !important;
+        }
+    }
+</style>
 <div class="container-fluid px-0">
     <!-- Header Section -->
     <div class="row mb-4">
@@ -197,7 +233,7 @@
                 <div class="tab-pane fade" id="tenants" role="tabpanel">
                     <div class="d-flex justify-content-between align-items-center mb-3">
                         <h5 class="mb-0">Active Tenants</h5>
-                        <a href="{{ route('tenants.create') }}" class="btn btn-sm btn-primary">
+                        <a href="{{ route('tenants.create', ['building_id' => $building->id]) }}" class="btn btn-sm btn-primary">
                             <i class="bi bi-plus-lg"></i> Register Tenant
                         </a>
                     </div>
@@ -207,14 +243,14 @@
                                 <tr>
                                     <th>Name</th>
                                     <th>Unit</th>
-                                    <th>Contact</th>
-                                    <th>Status</th>
+                                    <th class="d-none d-md-table-cell">Contact</th>
+                                    <th class="d-none d-md-table-cell">Status</th>
                                     <th>Actions</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 @forelse($building->tenants->unique('id') as $tenant)
-                                <tr>
+                                <tr class="{{ $tenant->active ? 'mobile-status-active' : 'mobile-status-inactive' }}">
                                     <td>
                                         <div class="fw-bold">{{ $tenant->full_name }}</div>
                                         <div class="small text-muted">{{ $tenant->email }}</div>
@@ -230,8 +266,8 @@
                                             {{ $tenantUnit ? $tenantUnit->unit_number : 'History' }}
                                         </span>
                                     </td>
-                                    <td>{{ $tenant->phone_number }}</td>
-                                    <td>
+                                    <td class="d-none d-md-table-cell">{{ $tenant->phone_number }}</td>
+                                    <td class="d-none d-md-table-cell">
                                         @if($tenant->active)
                                             <span class="badge bg-success">Active</span>
                                         @else
@@ -258,7 +294,7 @@
                 <div class="tab-pane fade" id="rents" role="tabpanel">
                     <div class="d-flex justify-content-between align-items-center mb-3">
                         <h5 class="mb-0">Rental Agreements</h5>
-                        <a href="{{ route('rents.create') }}" class="btn btn-sm btn-primary">
+                        <a href="{{ route('rents.create', ['building_id' => $building->id]) }}" class="btn btn-sm btn-primary">
                             <i class="bi bi-plus-lg"></i> Create Lease
                         </a>
                     </div>
@@ -270,13 +306,13 @@
                                     <th>Unit</th>
                                     <th>Duration</th>
                                     <th>Amount (Yearly)</th>
-                                    <th>Status</th>
+                                    <th class="d-none d-md-table-cell">Status</th>
                                     <th>Actions</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 @forelse($building->rents->sortByDesc('start_date') as $rent)
-                                <tr>
+                                <tr class="{{ $rent->status === 'ACTIVE' ? 'mobile-status-active' : 'mobile-status-inactive' }}" style="cursor: pointer;" onclick="window.location='{{ route('rents.agreement', $rent) }}'">
                                     <td>{{ $rent->tenant->full_name }}</td>
                                     <td>{{ $rent->unit->unit_number }}</td>
                                     <td>
@@ -284,7 +320,7 @@
                                         <div class="small text-muted">to {{ $rent->end_date ? $rent->end_date->format('M d, Y') : 'Indefinite' }}</div>
                                     </td>
                                     <td class="fw-bold">₦{{ number_format($rent->annual_amount, 2) }}</td>
-                                    <td>
+                                    <td class="d-none d-md-table-cell">
                                         @if($rent->status === 'ACTIVE')
                                             <span class="badge bg-success">Active</span>
                                         @else
@@ -292,7 +328,7 @@
                                         @endif
                                     </td>
                                     <td>
-                                        <div class="btn-group btn-group-sm">
+                                        <div class="btn-group btn-group-sm" onclick="event.stopPropagation()">
                                             <a href="{{ route('rents.show', $rent) }}" class="btn btn-outline-primary" title="Details">
                                                 <i class="bi bi-eye"></i>
                                             </a>
@@ -316,7 +352,7 @@
                 <div class="tab-pane fade" id="payments" role="tabpanel">
                     <div class="d-flex justify-content-between align-items-center mb-3">
                         <h5 class="mb-0">Payment History</h5>
-                        <a href="{{ route('payments.create') }}" class="btn btn-sm btn-success">
+                        <a href="{{ route('payments.create', ['building_id' => $building->id]) }}" class="btn btn-sm btn-success">
                             <i class="bi bi-plus-lg"></i> Record Payment
                         </a>
                     </div>
@@ -326,10 +362,10 @@
                                 <tr>
                                     <th>Date</th>
                                     <th>Tenant</th>
-                                    <th>Reference</th>
+                                    <th class="d-none d-md-table-cell">Reference</th>
                                     <th>Amount</th>
-                                    <th>Method</th>
-                                    <th>Status</th>
+                                    <th class="d-none d-md-table-cell">Method</th>
+                                    <th class="d-none d-md-table-cell">Status</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -337,14 +373,22 @@
                                     $payments = $building->rents->flatMap->payments->sortByDesc('payment_date');
                                 @endphp
                                 @forelse($payments as $payment)
-                                <tr>
-                                    <td>{{ $payment->payment_date }}</td>
+                                <tr class="{{ $payment->status === 'COMPLETED' ? 'mobile-status-completed' : ($payment->status === 'PENDING' ? 'mobile-status-pending' : ($payment->status === 'FAILED' ? 'mobile-status-failed' : 'mobile-status-inactive')) }}">
+                                    <td>{{ $payment->payment_date->format('Y-m-d') }}</td>
                                     <td>{{ $payment->rent->tenant->full_name }}</td>
-                                    <td class="font-monospace small">{{ Str::limit($payment->rent->unit->unit_number . '-' . $payment->id, 15) }}</td>
+                                    <td class="font-monospace small d-none d-md-table-cell">{{ Str::limit($payment->rent->unit->unit_number . '-' . $payment->id, 15) }}</td>
                                     <td class="fw-bold text-success">+₦{{ number_format($payment->amount, 2) }}</td>
-                                    <td>{{ ucfirst($payment->payment_method) }}</td>
-                                    <td>
-                                        <span class="badge bg-success">Completed</span>
+                                    <td class="d-none d-md-table-cell">{{ ucfirst($payment->payment_method) }}</td>
+                                    <td class="d-none d-md-table-cell">
+                                        @if($payment->status === 'COMPLETED')
+                                            <span class="badge bg-success">Completed</span>
+                                        @elseif($payment->status === 'PENDING')
+                                            <span class="badge bg-warning text-dark">Pending</span>
+                                        @elseif($payment->status === 'FAILED')
+                                            <span class="badge bg-danger">Failed</span>
+                                        @else
+                                            <span class="badge bg-secondary">{{ ucfirst(strtolower($payment->status)) }}</span>
+                                        @endif
                                     </td>
                                 </tr>
                                 @empty

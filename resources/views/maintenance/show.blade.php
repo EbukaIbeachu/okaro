@@ -4,9 +4,7 @@
 <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
     <h1 class="h2">Request Details</h1>
     <div class="btn-toolbar mb-2 mb-md-0">
-        <a href="{{ route('maintenance.index') }}" class="btn btn-sm btn-secondary me-2">
-            <i class="bi bi-arrow-left"></i> Back
-        </a>
+
         @if(auth()->user()->isAdmin() || auth()->user()->isManager() || $maintenance->status === 'PENDING')
             <a href="{{ route('maintenance.edit', $maintenance) }}" class="btn btn-sm btn-primary">
                 <i class="bi bi-pencil"></i> Edit

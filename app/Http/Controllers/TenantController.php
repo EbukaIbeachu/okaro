@@ -114,7 +114,7 @@ class TenantController extends Controller
             }
         }
 
-        return redirect()->route('tenants.index')->with('success', $message);
+        return redirect()->route('buildings.show', $request->building_id)->with('success', $message);
     }
 
     public function show(Tenant $tenant)

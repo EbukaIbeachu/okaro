@@ -16,6 +16,7 @@
             border-top: 5px solid #7c3aed; /* Purple top edge */
         }
         .hero-section {
+            background-color: #7c3aed; /* Fallback purple */
             background-image: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url('{{ asset("assets/images/hero-bg.jpg") }}');
             background-size: cover;
             background-position: center;
@@ -57,6 +58,10 @@
             box-shadow: 0 4px 12px rgba(124, 58, 237, 0.4);
             color: white;
         }
+        .btn-mobile-small {
+            padding: 6px 16px;
+            font-size: 0.9rem;
+        }
         .navbar-custom {
             background-color: transparent;
             position: absolute;
@@ -88,7 +93,7 @@
             <div class="d-flex align-items-center order-lg-2">
                 @if (Route::has('login'))
                     @auth
-                        <a href="{{ url('/dashboard') }}" class="btn btn-custom ms-2 d-lg-none">Dashboard</a>
+                        <a href="{{ url('/dashboard') }}" class="btn btn-custom btn-mobile-small ms-2 d-lg-none">Dashboard</a>
                     @else
                         <a href="{{ route('login') }}" class="nav-link d-lg-none me-3">Log in</a>
                     @endauth
@@ -110,9 +115,7 @@
                                 <a href="{{ route('login') }}" class="nav-link">Log in</a>
                             </li>
                             @if (Route::has('register'))
-                                <li class="nav-item">
-                                    <a href="{{ route('register') }}" class="btn btn-custom ms-3">Get Started</a>
-                                </li>
+                                <!-- Registration button removed as per request -->
                             @endif
                         @endauth
                     @endif
@@ -126,12 +129,20 @@
             <h1 class="hero-title">Modern Property Management Simplified</h1>
             <p class="hero-subtitle">Streamline your rental operations, manage tenants efficiently, and track payments effortlessly with Okaro & Associates.</p>
             @if (Route::has('register'))
-                <a href="{{ route('register') }}" class="btn btn-custom btn-lg">Start Managing Today</a>
+                @auth
+                    <div class="d-flex justify-content-center gap-3 flex-wrap">
+                        <a href="{{ url('/dashboard') }}" class="btn btn-custom btn-lg">Go to Dashboard</a>
+                    </div>
+                @else
+                    <!-- Registration button removed as per request -->
+                @endauth
             @else
                 <a href="{{ route('login') }}" class="btn btn-custom btn-lg">Login to Dashboard</a>
             @endif
         </div>
     </div>
+
+    <!-- Cache Buster: {{ time() }} -->
 
     <footer class="text-center py-3 bg-white border-top">
         <div class="container">

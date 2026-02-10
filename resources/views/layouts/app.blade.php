@@ -16,6 +16,110 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/driver.js@1.0.1/dist/driver.css"/>
 
     <style>
+        /* Chatbot Widget Styles */
+        #chatbot-widget {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 1000;
+        }
+        #chatbot-toggle {
+            background-color: #7c3aed;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(124, 58, 237, 0.4);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            transition: all 0.3s ease;
+        }
+        #chatbot-toggle:hover {
+            transform: scale(1.1);
+            background-color: #6d28d9;
+        }
+        #chatbot-window {
+            position: fixed;
+            bottom: 90px;
+            right: 20px;
+            width: 350px;
+            height: 500px;
+            background-color: white;
+            border-radius: 12px;
+            box-shadow: 0 5px 25px rgba(0,0,0,0.15);
+            display: none;
+            flex-direction: column;
+            overflow: hidden;
+            z-index: 1000;
+            border: 1px solid rgba(124, 58, 237, 0.2);
+        }
+        #chatbot-header {
+            background-color: #7c3aed;
+            color: white;
+            padding: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        #chatbot-messages {
+            flex: 1;
+            padding: 15px;
+            overflow-y: auto;
+            background-color: #f9f9f9;
+        }
+        .chat-message {
+            margin-bottom: 15px;
+            max-width: 80%;
+            padding: 10px 15px;
+            border-radius: 15px;
+            font-size: 0.9rem;
+        }
+        .user-message {
+            background-color: #7c3aed;
+            color: white;
+            margin-left: auto;
+            border-bottom-right-radius: 5px;
+        }
+        .bot-message {
+            background-color: #e9ecef;
+            color: #333;
+            margin-right: auto;
+            border-bottom-left-radius: 5px;
+        }
+        #chatbot-input-area {
+            padding: 15px;
+            border-top: 1px solid #eee;
+            background-color: white;
+            display: flex;
+            gap: 10px;
+        }
+        #chatbot-input {
+            flex: 1;
+            border: 1px solid #ddd;
+            border-radius: 20px;
+            padding: 8px 15px;
+            outline: none;
+        }
+        #chatbot-input:focus {
+            border-color: #7c3aed;
+        }
+        #chatbot-send {
+            background-color: #7c3aed;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 35px;
+            height: 35px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+        }
+        
         body {
             font-family: 'Nunito', sans-serif;
             background-color: #fdfbf7; /* Off-white */
@@ -363,6 +467,16 @@
                     </div>
                 @endif
 
+                @auth
+                    @if(!request()->routeIs('dashboard'))
+                        <div class="mb-2">
+                            <a href="javascript:history.back()" class="text-decoration-none text-secondary">
+                                <i class="bi bi-arrow-left fs-5"></i>
+                            </a>
+                        </div>
+                    @endif
+                @endauth
+
                 @yield('content')
             </main>
         </div>
@@ -602,6 +716,7 @@
             width: 100%;
             height: 100%;
             z-index: 9999;
+            background-color: #333; /* Fallback color */
             background-image: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url('{{ asset("assets/images/hero-bg.jpg") }}');
             background-size: cover;
             background-position: center;
@@ -620,10 +735,155 @@
         <div>
             <h1 class="display-3 fw-bold">Okaro & Associates</h1>
             <p class="lead fs-3">Property Management Simplified</p>
-            <p class="mt-4 opacity-75"><small><i class="bi bi-mouse me-2"></i>Move mouse or press any key to return</small></p>
+            <p class="mt-4 opacity-75">
+                <small class="d-none d-lg-inline"><i class="bi bi-mouse me-2"></i>Move mouse or press any key to return</small>
+                <small class="d-lg-none">Tap screen to continue</small>
+            </p>
+
         </div>
     </div>
+
+    <!-- Chatbot Widget HTML -->
+    <div id="chatbot-widget">
+        <button id="chatbot-toggle" onclick="toggleChatbot()">
+            <i class="bi bi-chat-dots-fill"></i>
+        </button>
+    </div>
+
+    <div id="chatbot-window">
+        <div id="chatbot-header">
+            <span class="fw-bold"><i class="bi bi-robot me-2"></i>Okaro Assistant</span>
+            <button class="btn btn-sm text-white" onclick="toggleChatbot()">
+                <i class="bi bi-x-lg"></i>
+            </button>
+        </div>
+        <div id="chatbot-messages">
+            <div class="chat-message bot-message">
+                Hello! I'm your AI assistant. How can I help you today?
+            </div>
+        </div>
+        <div id="chatbot-input-area">
+            <input type="text" id="chatbot-input" placeholder="Type your message..." onkeypress="handleEnter(event)">
+            <button id="chatbot-send" onclick="sendMessage()">
+                <i class="bi bi-send-fill"></i>
+            </button>
+        </div>
+    </div>
+
     <script>
+        function toggleChatbot() {
+            const window = document.getElementById('chatbot-window');
+            if (window.style.display === 'flex') {
+                window.style.display = 'none';
+            } else {
+                window.style.display = 'flex';
+                document.getElementById('chatbot-input').focus();
+            }
+        }
+
+        function handleEnter(e) {
+            if (e.key === 'Enter') {
+                sendMessage();
+            }
+        }
+
+        function sendMessage() {
+            const input = document.getElementById('chatbot-input');
+            const message = input.value.trim();
+            
+            if (message) {
+                // Add user message
+                addMessage(message, 'user');
+                input.value = '';
+
+                // Simulate AI response (Ollama integration placeholder)
+                showTypingIndicator();
+                
+                // Use a relative path directly to avoid environment configuration issues
+                // Changed from /chatbot/send to /bot/message to avoid 403 blocks
+                const endpoint = '/bot/message';
+                console.log('Chatbot sending to:', endpoint);
+
+                fetch(endpoint, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                    },
+                    body: JSON.stringify({ message: message })
+                })
+                .then(async response => {
+                    const isJson = response.headers.get('content-type')?.includes('application/json');
+                    const text = await response.text();
+                    
+                    if (!response.ok) {
+                        throw new Error(`Server Error (${response.status}): ${text.substring(0, 50)}...`);
+                    }
+                    
+                    if (!isJson) {
+                         // Fallback: If response is text but 200 OK, maybe it's a raw string?
+                         // Check if it looks like the valid response format
+                         console.warn("Received non-JSON response:", text);
+                         try {
+                             return JSON.parse(text);
+                         } catch (e) {
+                             throw new Error(`Invalid Response Format: ${text.substring(0, 50)}...`);
+                         }
+                    }
+                    
+                    return JSON.parse(text);
+                })
+                .then(data => {
+                    removeTypingIndicator();
+                    addMessage(data.response, 'bot');
+                })
+                .catch(error => {
+                    removeTypingIndicator();
+                    console.error('Chatbot Error:', error);
+                    let errMsg = "Sorry, I'm having trouble connecting to the server right now.";
+                    
+                    // Show specific error details if available
+                    if (error.message) {
+                        errMsg += ` (${error.message})`;
+                    }
+                    
+                    // Add helpful hint for Failed to fetch
+                    if (error.message === 'Failed to fetch') {
+                         errMsg += " - Please check your internet connection or if the server URL is correct.";
+                    }
+
+                    addMessage(errMsg, 'bot');
+                });
+            }
+        }
+
+        function addMessage(text, sender) {
+            const messagesDiv = document.getElementById('chatbot-messages');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `chat-message ${sender}-message`;
+            messageDiv.textContent = text;
+            messagesDiv.appendChild(messageDiv);
+            messagesDiv.scrollTop = messagesDiv.scrollHeight;
+        }
+
+        function showTypingIndicator() {
+            const messagesDiv = document.getElementById('chatbot-messages');
+            const indicator = document.createElement('div');
+            indicator.className = 'chat-message bot-message typing-indicator';
+            indicator.id = 'typing-indicator';
+            indicator.innerHTML = '<i class="bi bi-three-dots"></i>';
+            messagesDiv.appendChild(indicator);
+            messagesDiv.scrollTop = messagesDiv.scrollHeight;
+        }
+
+        function removeTypingIndicator() {
+            const indicator = document.getElementById('typing-indicator');
+            if (indicator) {
+                indicator.remove();
+            }
+        }
+
         (function() {
             let inactivityTime = function () {
                 let time;

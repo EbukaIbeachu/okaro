@@ -43,18 +43,9 @@ class UnitController extends Controller
             return back()->withErrors(['unit_number' => 'This unit already exists in the building.'])->withInput();
         }
 
-        // Check if building has reached its total unit capacity
-        $building = Building::find($request->building_id);
-        if ($building && $building->total_units > 0) {
-            $currentUnitCount = Unit::where('building_id', $building->id)->count();
-            if ($currentUnitCount >= $building->total_units) {
-                return back()->withErrors(['building_id' => "This building has reached its capacity of {$building->total_units} units."])->withInput();
-            }
-        }
-
         Unit::create($validated);
 
-        return redirect()->route('buildings.show', $validated['building_id'])->with('success', 'Unit created successfully.');
+        return redirect()->route('units.index')->with('success', 'Unit created successfully.');
     }
 
     public function show(Unit $unit)

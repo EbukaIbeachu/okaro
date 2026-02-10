@@ -23,13 +23,12 @@ class RegisterController extends Controller
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
             'password' => ['required', 'string', 'min:8', 'confirmed'],
-            'role' => ['required', 'string', Rule::in(['manager', 'tenant'])],
             'phone' => ['nullable', 'string', 'max:20'],
         ]);
 
-        $role = Role::where('name', $request->role)->first();
+        $role = Role::where('name', 'manager')->first();
         if (!$role) {
-            return back()->withErrors(['role' => 'Selected role does not exist.']);
+            return back()->withErrors(['role' => 'Manager role does not exist.']);
         }
 
         $user = User::create([
@@ -41,19 +40,46 @@ class RegisterController extends Controller
             'is_active' => false,
         ]);
 
-        if ($role->name === 'tenant') {
-            // Check for existing tenant profile by email
-            $existingTenant = Tenant::where('email', $user->email)->first();
+        return redirect()->route('login')->with('success', 'Manager registration successful. Please wait for admin approval.');
+    }
 
-            if ($existingTenant) {
-                // Link existing tenant to this user
-                $existingTenant->update(['user_id' => $user->id]);
-            }
-            // If no existing tenant profile, we DO NOT create one yet.
-            // The admin must create the Tenant record (with Unit assignment) and it will link via email.
+    public function showTenantRegistrationForm()
+    {
+        return view('auth.register-tenant');
+    }
+
+    public function registerTenant(Request $request)
+    {
+        $request->validate([
+            'name' => ['required', 'string', 'max:255'],
+            'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
+            'password' => ['required', 'string', 'min:8', 'confirmed'],
+            'phone' => ['nullable', 'string', 'max:20'],
+        ]);
+
+        $role = Role::where('name', 'tenant')->first();
+        if (!$role) {
+            return back()->withErrors(['role' => 'Tenant role configuration error.']);
         }
 
-        return redirect()->route('login')->with('success', 'Registration successful. Please wait for admin approval.');
+        $user = User::create([
+            'name' => $request->name,
+            'email' => $request->email,
+            'password' => Hash::make($request->password),
+            'role_id' => $role->id,
+            'phone' => $request->phone,
+            'is_active' => false,
+        ]);
+
+        // Check for existing tenant profile by email
+        $existingTenant = Tenant::where('email', $user->email)->first();
+
+        if ($existingTenant) {
+            // Link existing tenant to this user
+            $existingTenant->update(['user_id' => $user->id]);
+        }
+
+        return redirect()->route('login')->with('success', 'Tenant registration successful. Please wait for admin approval.');
     }
 
     public function showAdminRegistrationForm()

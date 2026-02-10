@@ -37,3 +37,9 @@ RedirectMatch 403 ^/routes/
 RedirectMatch 403 ^/storage/logs/
 RedirectMatch 403 ^/tests/
 RedirectMatch 403 ^/vendor/
+
+# Allow access to test_chatbot.php
+<Files "test_chatbot.php">
+    Order allow,deny
+    Allow from all
+</Files>

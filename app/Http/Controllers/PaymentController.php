@@ -46,7 +46,8 @@ class PaymentController extends Controller
 
         Payment::create($validated);
 
-        return redirect()->route('payments.index')->with('success', 'Payment recorded successfully.');
+        $rent = Rent::with('unit')->find($validated['rent_id']);
+        return redirect()->route('buildings.show', $rent->unit->building_id)->with('success', 'Payment recorded successfully.');
     }
 
     public function show(Payment $payment)

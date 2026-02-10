@@ -3,9 +3,6 @@
 @section('content')
 <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
     <h1 class="h2" id="dashboard-title">{{ Auth::user()->isManager() ? 'Manager Dashboard' : 'Admin Dashboard' }}</h1>
-    <button class="btn btn-outline-info btn-sm" onclick="startTour()">
-        <i class="bi bi-question-circle"></i> Start Tour
-    </button>
 </div>
 
 <!-- Stats Cards -->

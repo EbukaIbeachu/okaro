@@ -6,10 +6,10 @@
         <div class="col-md-6 col-lg-5">
             <div class="card shadow-sm">
                 <div class="card-header bg-primary text-white text-center">
-                    <h4 class="mb-0"><i class="bi bi-person-plus me-2"></i> Manager Registration</h4>
+                    <h4 class="mb-0"><i class="bi bi-person-plus me-2"></i> Tenant Registration</h4>
                 </div>
                 <div class="card-body p-4">
-                    <form method="POST" action="{{ route('register') }}">
+                    <form method="POST" action="{{ url('/register-tenant') }}">
                         @csrf
 
                         <div class="mb-3">
@@ -36,7 +36,7 @@
                             @enderror
                         </div>
 
-                        {{-- Role is automatically set to Manager --}}
+                        {{-- Role is automatically set to Tenant --}}
 
                         <div class="mb-3">
                             <label for="password" class="form-label">Password</label>
@@ -52,7 +52,7 @@
                         </div>
 
                         <div class="d-grid gap-2">
-                            <button type="submit" class="btn btn-primary">Register</button>
+                            <button type="submit" class="btn btn-primary">Start</button>
                             <a href="{{ route('login') }}" class="btn btn-link text-center">Already have an account? Login</a>
                         </div>
                     </form>

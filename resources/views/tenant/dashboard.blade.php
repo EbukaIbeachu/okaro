@@ -47,9 +47,14 @@
                     <p>No active rental agreement found.</p>
                 @endif
             </div>
-            @if($rent && $rent->balance > 0)
-            <div class="card-footer">
-                <a href="#" class="btn btn-primary w-100">Pay Now</a>
+            @if($rent)
+            <div class="card-footer d-grid gap-2">
+                @if($rent->balance > 0)
+                    <a href="{{ route('payments.create', ['rent_id' => $rent->id]) }}" class="btn btn-primary">Pay Now</a>
+                @endif
+                <a href="{{ route('rents.agreement', $rent) }}" class="btn btn-outline-secondary">
+                    <i class="bi bi-file-text"></i> View Rental Agreement
+                </a>
             </div>
             @endif
         </div>

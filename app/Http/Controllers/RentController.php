@@ -79,12 +79,21 @@ class RentController extends Controller
             }
         }
 
-        return redirect()->route('rents.index')->with('success', 'Rental agreement created successfully.');
+        return redirect()->route('buildings.show', Unit::find($validated['unit_id'])->building_id)->with('success', 'Rental agreement created successfully.');
     }
 
     public function show(Rent $rent)
     {
         $rent->load(['tenant', 'unit.building', 'payments']);
+        
+        // Authorization: Admin/Manager or the specific Tenant
+        $user = auth()->user();
+        if (!$user->isAdmin() && !$user->isManager()) {
+             if (!$rent->tenant || $rent->tenant->user_id !== $user->id) {
+                 abort(403, 'Unauthorized action.');
+             }
+        }
+
         return view('rents.show', compact('rent'));
     }
 
@@ -170,11 +179,28 @@ class RentController extends Controller
     public function agreement(Rent $rent)
     {
         $rent->load(['tenant', 'unit.building']);
+
+        // Authorization: Admin/Manager or the specific Tenant
+        $user = auth()->user();
+        if (!$user->isAdmin() && !$user->isManager()) {
+             if (!$rent->tenant || $rent->tenant->user_id !== $user->id) {
+                 abort(403, 'Unauthorized action.');
+             }
+        }
+
         return view('rents.agreement', compact('rent'));
     }
 
     public function uploadAgreement(Request $request, Rent $rent)
     {
+        // Authorization: Admin/Manager or the specific Tenant
+        $user = auth()->user();
+        if (!$user->isAdmin() && !$user->isManager()) {
+             if (!$rent->tenant || $rent->tenant->user_id !== $user->id) {
+                 abort(403, 'Unauthorized action.');
+             }
+        }
+
         $request->validate([
             'signed_agreement' => 'required|file|mimes:pdf,jpg,jpeg,png|max:10240', // 10MB max
         ]);
@@ -192,5 +218,26 @@ class RentController extends Controller
         }
 
         return back()->with('error', 'No file uploaded.');
+    }
+
+    public function downloadAgreement(Rent $rent)
+    {
+        // Authorization: Admin/Manager or the specific Tenant
+        $user = auth()->user();
+        if (!$user->isAdmin() && !$user->isManager()) {
+             if (!$rent->tenant || $rent->tenant->user_id !== $user->id) {
+                 abort(403, 'Unauthorized action.');
+             }
+        }
+
+        if (!$rent->signed_agreement_path || !\Illuminate\Support\Facades\Storage::disk('public')->exists($rent->signed_agreement_path)) {
+            return back()->with('error', 'No signed agreement found.');
+        }
+
+        $path = $rent->signed_agreement_path;
+        $extension = pathinfo($path, PATHINFO_EXTENSION);
+        $filename = 'Tenancy_Agreement_' . str_replace(' ', '_', $rent->tenant->full_name) . '.' . $extension;
+        
+        return \Illuminate\Support\Facades\Storage::disk('public')->download($path, $filename);
     }
 }

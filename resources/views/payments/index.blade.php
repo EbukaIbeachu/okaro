@@ -42,7 +42,13 @@
                                 {{ $payment->rent->tenant->full_name }}
                             </a>
                             <br>
-                            <small class="text-muted">Unit {{ $payment->rent->unit->unit_number }}</small>
+                            <small class="text-muted">
+                                @if($payment->rent->unit)
+                                    Unit {{ $payment->rent->unit->unit_number }}
+                                @else
+                                    <span class="fst-italic">Unit Removed</span>
+                                @endif
+                            </small>
                         </td>
                         @if(Auth::user()->isAdmin())
                         <td>

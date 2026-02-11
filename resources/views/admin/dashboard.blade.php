@@ -107,7 +107,13 @@
                                 <td>{{ $payment->payment_date->format('M d, Y') }}</td>
                                 <td>{{ $payment->rent->tenant->full_name }}</td>
                                 <td class="text-success">₦{{ number_format($payment->amount, 2) }}</td>
-                                <td>{{ $payment->rent->unit->unit_number }}</td>
+                                <td>
+                                    @if($payment->rent->unit)
+                                        {{ $payment->rent->unit->unit_number }}
+                                    @else
+                                        <span class="text-muted fst-italic">Unit Removed</span>
+                                    @endif
+                                </td>
                             </tr>
                             @empty
                             <tr>

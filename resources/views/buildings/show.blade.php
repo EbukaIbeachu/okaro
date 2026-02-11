@@ -312,8 +312,14 @@
                             </thead>
                             <tbody>
                                 @forelse($building->rents->sortByDesc('start_date') as $rent)
-                                <tr class="{{ $rent->status === 'ACTIVE' ? 'mobile-status-active' : 'mobile-status-inactive' }}" style="cursor: pointer;" onclick="window.location='{{ route('rents.agreement', $rent) }}'">
-                                    <td>{{ $rent->tenant->full_name }}</td>
+                                <tr class="{{ $rent->status === 'ACTIVE' ? 'mobile-status-active' : 'mobile-status-inactive' }}" 
+                                    style="cursor: pointer;" 
+                                    onclick="window.open('{{ route('rents.agreement', $rent) }}', '_blank')"
+                                    title="Click to view PDF Agreement">
+                                    <td>
+                                        {{ $rent->tenant->full_name }}
+                                        <i class="bi bi-file-earmark-pdf text-danger ms-1 small" title="PDF Agreement"></i>
+                                    </td>
                                     <td>{{ $rent->unit->unit_number }}</td>
                                     <td>
                                         <div class="small">{{ $rent->start_date->format('M d, Y') }}</div>

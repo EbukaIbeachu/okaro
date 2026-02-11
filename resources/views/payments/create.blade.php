@@ -25,7 +25,7 @@
                                 <option value="{{ $rent->id }}" 
                                         data-balance="{{ $rent->balance }}"
                                         {{ (old('rent_id') == $rent->id || (isset($selectedRent) && $selectedRent && $selectedRent->id == $rent->id)) ? 'selected' : '' }}>
-                                    {{ $rent->tenant->full_name }} - Unit {{ $rent->unit->unit_number }} (₦{{ number_format($rent->annual_amount, 2) }}/yr)
+                                    {{ $rent->tenant->full_name }} - Unit {{ $rent->unit ? $rent->unit->unit_number : 'Removed' }} (₦{{ number_format($rent->annual_amount, 2) }}/yr)
                                 </option>
                             @endforeach
                         </select>

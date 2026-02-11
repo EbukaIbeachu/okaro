@@ -48,11 +48,15 @@
                             </a>
                         </td>
                         <td>
-                            <a href="{{ route('units.show', $rent->unit) }}" class="text-decoration-none text-dark">
-                                {{ $rent->unit->unit_number }}
-                            </a>
-                            <br>
-                            <small class="text-muted">{{ $rent->unit->building->name }}</small>
+                            @if($rent->unit)
+                                <a href="{{ route('units.show', $rent->unit) }}" class="text-decoration-none text-dark">
+                                    {{ $rent->unit->unit_number }}
+                                </a>
+                                <br>
+                                <small class="text-muted">{{ $rent->unit->building->name }}</small>
+                            @else
+                                <span class="fst-italic text-muted">Unit Removed</span>
+                            @endif
                         </td>
                         <td>
                             {{ $rent->start_date }} <br>

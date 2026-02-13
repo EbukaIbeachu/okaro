@@ -22,21 +22,21 @@
             <table class="table table-striped table-hover align-middle" id="paymentsTable">
                 <thead>
                     <tr>
-                        <th>Date</th>
+                        <th class="d-none d-md-table-cell">Date</th>
                         <th>Tenant</th>
                         @if(Auth::user()->isAdmin())
                         <th>Created By</th>
                         @endif
                         <th>Amount</th>
-                        <th>Method</th>
-                        <th>Status</th>
+                        <th class="d-none d-md-table-cell">Method</th>
+                        <th class="d-none d-md-table-cell">Status</th>
                         <th class="text-end">Actions</th>
                     </tr>
                 </thead>
                 <tbody>
                     @forelse($payments as $payment)
-                    <tr>
-                        <td>{{ $payment->payment_date }}</td>
+                    <tr class="@if($payment->status === 'COMPLETED') table-success @elseif($payment->status === 'PENDING') table-warning @else table-danger @endif">
+                        <td class="d-none d-md-table-cell">{{ $payment->payment_date }}</td>
                         <td>
                             <a href="{{ route('tenants.show', $payment->rent->tenant) }}" class="text-decoration-none fw-bold">
                                 {{ $payment->rent->tenant->full_name }}
@@ -65,8 +65,8 @@
                         </td>
                         @endif
                         <td>₦{{ number_format($payment->amount, 2) }}</td>
-                        <td>{{ ucfirst(str_replace('_', ' ', $payment->payment_method)) }}</td>
-                        <td>
+                        <td class="d-none d-md-table-cell">{{ ucfirst(str_replace('_', ' ', $payment->payment_method)) }}</td>
+                        <td class="d-none d-md-table-cell">
                             @if($payment->status === 'COMPLETED')
                                 <span class="badge bg-success">Completed</span>
                             @elseif($payment->status === 'PENDING')

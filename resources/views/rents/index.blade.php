@@ -15,39 +15,39 @@
 
 <div class="card shadow-sm">
     <div class="card-body">
-        <div class="d-flex justify-content-between align-items-center mb-3">
-            <div class="btn-group">
+        <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-3 gap-2">
+            <div class="btn-group w-100 w-md-auto">
                 <a href="{{ route('rents.index', ['status' => 'ACTIVE']) }}" class="btn btn-sm {{ $status === 'ACTIVE' ? 'btn-primary' : 'btn-outline-primary' }}">Active</a>
                 <a href="{{ route('rents.index', ['status' => 'EXPIRED']) }}" class="btn btn-sm {{ $status === 'EXPIRED' ? 'btn-primary' : 'btn-outline-primary' }}">Expired</a>
                 <a href="{{ route('rents.index', ['status' => 'TERMINATED']) }}" class="btn btn-sm {{ $status === 'TERMINATED' ? 'btn-primary' : 'btn-outline-primary' }}">Terminated</a>
                 <a href="{{ route('rents.index', ['status' => 'ALL']) }}" class="btn btn-sm {{ $status === 'ALL' ? 'btn-primary' : 'btn-outline-primary' }}">All</a>
             </div>
-            <input type="text" id="rentSearch" class="form-control w-auto" placeholder="Search agreements...">
+            <input type="text" id="rentSearch" class="form-control w-100 w-md-auto" placeholder="Search agreements...">
         </div>
         <div class="table-responsive">
             <table class="table table-striped table-hover align-middle" id="rentsTable">
                 <thead>
                     <tr>
                         <th>Tenant</th>
-                        <th>Unit</th>
-                        <th>Period</th>
+                        <th class="d-none d-md-table-cell">Unit</th>
+                        <th class="d-none d-md-table-cell">Period</th>
                         <th>Amount</th>
                         @if(Auth::user()->isAdmin())
-                        <th>Created By</th>
+                        <th class="d-none d-md-table-cell">Created By</th>
                         @endif
-                        <th>Status</th>
+                        <th class="d-none d-md-table-cell">Status</th>
                         <th class="text-end">Actions</th>
                     </tr>
                 </thead>
                 <tbody>
                     @forelse($rents as $rent)
-                    <tr>
+                    <tr class="clickable-row @if($rent->status === 'ACTIVE') table-success @elseif($rent->status === 'EXPIRED') table-warning @else table-secondary @endif" data-href="{{ route('rents.agreement', $rent) }}" style="cursor: pointer;">
                         <td>
-                            <a href="{{ route('tenants.show', $rent->tenant) }}" class="text-decoration-none fw-bold">
+                            <a href="{{ route('rents.show', $rent) }}" class="text-decoration-none fw-bold">
                                 {{ $rent->tenant->full_name }}
                             </a>
                         </td>
-                        <td>
+                        <td class="d-none d-md-table-cell">
                             @if($rent->unit)
                                 <a href="{{ route('units.show', $rent->unit) }}" class="text-decoration-none text-dark">
                                     {{ $rent->unit->unit_number }}
@@ -58,13 +58,13 @@
                                 <span class="fst-italic text-muted">Unit Removed</span>
                             @endif
                         </td>
-                        <td>
+                        <td class="d-none d-md-table-cell">
                             {{ $rent->start_date }} <br>
                             <small class="text-muted">to {{ $rent->end_date ?? 'Indefinite' }}</small>
                         </td>
                         <td>₦{{ number_format($rent->annual_amount, 2) }}</td>
                         @if(Auth::user()->isAdmin())
-                        <td>
+                        <td class="d-none d-md-table-cell">
                             @if($rent->creator)
                                 <div class="d-flex align-items-center">
                                     <div class="ms-2">
@@ -77,7 +77,7 @@
                             @endif
                         </td>
                         @endif
-                        <td>
+                        <td class="d-none d-md-table-cell">
                             @if($rent->status === 'ACTIVE')
                                 <span class="badge bg-success">Active</span>
                             @else
@@ -128,7 +128,26 @@
 @push('scripts')
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        setupTableSearch('rentSearch', 'rentsTable');
+        // Search functionality
+        if (typeof setupTableSearch === 'function') {
+            setupTableSearch('rentSearch', 'rentsTable');
+        }
+
+        // Clickable Row Logic
+        const rows = document.querySelectorAll('.clickable-row');
+        rows.forEach(row => {
+            row.addEventListener('click', function(e) {
+                // Prevent navigation if clicking on interactive elements
+                if (e.target.closest('a') || e.target.closest('button') || e.target.closest('form') || e.target.closest('input')) {
+                    return;
+                }
+                
+                const url = this.dataset.href;
+                if (url) {
+                    window.location.href = url;
+                }
+            });
+        });
     });
 </script>
 @endpush

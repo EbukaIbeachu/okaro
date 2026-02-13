@@ -16,6 +16,17 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/driver.js@1.0.1/dist/driver.css"/>
 
     <style>
+        /* Mobile Background Image */
+        @media (max-width: 768px) {
+            body {
+                background-image: linear-gradient(rgba(255, 255, 255, 0.8), rgba(255, 255, 255, 0.8)), url('{{ asset("assets/images/hero-bg.jpg") }}') !important;
+                background-size: cover;
+                background-position: center;
+                background-repeat: no-repeat;
+                background-attachment: fixed;
+            }
+        }
+
         /* Chatbot Widget Styles */
         #chatbot-widget {
             position: fixed;
@@ -320,6 +331,52 @@
         .sidebar.show {
             transform: translateX(0);
         }
+
+        /* Clicker Game Styles */
+        .card.interactive {
+            cursor: pointer;
+            transition: transform 0.1s, box-shadow 0.2s;
+            user-select: none;
+            position: relative;
+            overflow: hidden;
+        }
+        .card.interactive:active {
+            transform: scale(0.98);
+        }
+        .ripple {
+            position: absolute;
+            background: rgba(255, 255, 255, 0.4);
+            border-radius: 50%;
+            transform: scale(0);
+            animation: ripple-animation 0.6s linear;
+            pointer-events: none;
+        }
+        @keyframes ripple-animation {
+            to {
+                transform: scale(4);
+                opacity: 0;
+            }
+        }
+        .floating-text {
+            position: absolute;
+            color: #ffd700;
+            font-weight: bold;
+            font-size: 1.2rem;
+            pointer-events: none;
+            animation: float-up 1s ease-out forwards;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+            z-index: 1000;
+        }
+        @keyframes float-up {
+            0% {
+                transform: translateY(0) scale(1);
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(-50px) scale(1.5);
+                opacity: 0;
+            }
+        }
     </style>
 </head>
 <body>
@@ -460,10 +517,22 @@
                         <i class="bi bi-list"></i>
                     </button>
                     <span class="h4 mb-0 text-primary fw-bold">Okaro & Associates</span>
+                    
+                    <!-- Coin Wallet Display -->
+                    <div class="ms-auto d-flex align-items-center bg-white border rounded-pill px-3 py-1 shadow-sm">
+                        <i class="bi bi-coin text-warning fs-5 me-2"></i>
+                        <span id="coin-wallet-desktop" class="fw-bold text-dark">0.00</span>
+                    </div>
                 </div>
 
                 <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom d-md-none">
                     <h1 class="h2 text-primary fw-bold">{{ Auth::user()->isAdmin() ? 'Admin' : (Auth::user()->isManager() ? 'Manager' : 'Tenant') }}</h1>
+                    
+                    <!-- Mobile Coin Wallet Display -->
+                    <div class="d-flex align-items-center bg-white border rounded-pill px-3 py-1 shadow-sm ms-auto">
+                        <i class="bi bi-coin text-warning fs-5 me-2"></i>
+                        <span id="coin-wallet-mobile" class="fw-bold text-dark">0.00</span>
+                    </div>
                 </div>
                 @endauth
 
@@ -519,6 +588,88 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/driver.js@1.0.1/dist/driver.js.iife.js"></script>
     <script>
+        // Clicker Game Logic
+        document.addEventListener('DOMContentLoaded', function() {
+            let coins = parseFloat(localStorage.getItem('okaro_coins') || '0');
+            const walletDisplayDesktop = document.getElementById('coin-wallet-desktop');
+            const walletDisplayMobile = document.getElementById('coin-wallet-mobile');
+            
+            // Initialize Display
+            updateWalletDisplay();
+
+            // Make all cards interactive
+            const cards = document.querySelectorAll('.card');
+            cards.forEach(card => {
+                card.classList.add('interactive');
+                card.addEventListener('click', handleCardClick);
+            });
+
+            function handleCardClick(e) {
+                // Determine increment value based on thresholds
+                let increment = 0.25;
+                if (coins >= 1000) {
+                    increment = 1.0;
+                } else if (coins >= 100) {
+                    increment = 0.5;
+                }
+
+                // Update State
+                coins += increment;
+                localStorage.setItem('okaro_coins', coins.toString());
+                updateWalletDisplay();
+
+                // Trigger Visuals
+                createRipple(e, this);
+                createFloatingText(e, increment);
+            }
+
+            function updateWalletDisplay() {
+                if(walletDisplayDesktop) {
+                    walletDisplayDesktop.textContent = coins.toFixed(2);
+                }
+                if(walletDisplayMobile) {
+                    walletDisplayMobile.textContent = coins.toFixed(2);
+                }
+            }
+
+            function createRipple(event, element) {
+                const circle = document.createElement('span');
+                const diameter = Math.max(element.clientWidth, element.clientHeight);
+                const radius = diameter / 2;
+
+                const rect = element.getBoundingClientRect();
+                
+                circle.style.width = circle.style.height = `${diameter}px`;
+                circle.style.left = `${event.clientX - rect.left - radius}px`;
+                circle.style.top = `${event.clientY - rect.top - radius}px`;
+                circle.classList.add('ripple');
+
+                const ripple = element.getElementsByClassName('ripple')[0];
+                if (ripple) {
+                    ripple.remove();
+                }
+
+                element.appendChild(circle);
+            }
+
+            function createFloatingText(event, amount) {
+                const text = document.createElement('div');
+                text.textContent = '+' + amount.toFixed(2);
+                text.classList.add('floating-text');
+                
+                // Position at click coordinates relative to viewport to avoid overflow issues
+                text.style.left = `${event.clientX}px`;
+                text.style.top = `${event.clientY}px`;
+                
+                document.body.appendChild(text); // Append to body to float freely
+
+                // Clean up after animation
+                setTimeout(() => {
+                    text.remove();
+                }, 1000);
+            }
+        });
+
         // Tour Configuration
         document.addEventListener('DOMContentLoaded', function() {
             window.startTour = function() {

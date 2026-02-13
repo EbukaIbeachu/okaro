@@ -24,7 +24,7 @@
             z-index: 1000;
         }
         #chatbot-toggle {
-            background-color: #7c3aed;
+            background-color: var(--primary-color);
             color: white;
             border: none;
             border-radius: 50%;
@@ -40,7 +40,7 @@
         }
         #chatbot-toggle:hover {
             transform: scale(1.1);
-            background-color: #6d28d9;
+            background-color: var(--primary-hover);
         }
         #chatbot-window {
             position: fixed;
@@ -58,7 +58,7 @@
             border: 1px solid rgba(124, 58, 237, 0.2);
         }
         #chatbot-header {
-            background-color: #7c3aed;
+            background-color: var(--primary-color);
             color: white;
             padding: 15px;
             display: flex;
@@ -79,7 +79,7 @@
             font-size: 0.9rem;
         }
         .user-message {
-            background-color: #7c3aed;
+            background-color: var(--primary-color);
             color: white;
             margin-left: auto;
             border-bottom-right-radius: 5px;
@@ -105,10 +105,10 @@
             outline: none;
         }
         #chatbot-input:focus {
-            border-color: #7c3aed;
+            border-color: var(--primary-color);
         }
         #chatbot-send {
-            background-color: #7c3aed;
+            background-color: var(--primary-color);
             color: white;
             border: none;
             border-radius: 50%;
@@ -120,177 +120,205 @@
             cursor: pointer;
         }
         
-        body {
-            font-family: 'Nunito', sans-serif;
-            background-color: #fdfbf7; /* Off-white */
-            transition: margin-left 0.3s;
-            border-top: 5px solid #7c3aed; /* Purple top edge */
-        }
-        /* Modal Enhancements */
-        .modal-content {
-            background-color: #fdfbf7;
-            border: 1px solid #7c3aed; /* Purple border */
-            box-shadow: 0 0 20px rgba(124, 58, 237, 0.15);
-        }
-        .modal-header {
-            border-bottom: 1px solid rgba(124, 58, 237, 0.2);
-        }
-        .modal-footer {
-            border-top: 1px solid rgba(124, 58, 237, 0.2);
+        :root {
+            --sidebar-width: 260px;
+            --header-height: 60px;
+            --primary-color: #7c3aed;
+            --primary-hover: #6d28d9;
+            --bg-light: #fdfbf7;
         }
 
-        .sidebar {
-            min-height: 100vh;
-            background-color: #343a40;
-            color: white;
-            border-right: 2px solid #7c3aed; /* Purple line */
-            width: 250px;
+        body {
+            font-family: 'Nunito', sans-serif;
+            background-color: var(--bg-light);
+            overflow-x: hidden;
+        }
+
+        /* Top Navbar */
+        .navbar-top {
+            height: var(--header-height);
+            background: white;
+            box-shadow: 0 2px 15px rgba(0,0,0,0.05);
             position: fixed;
             top: 0;
             left: 0;
-            z-index: 100;
-            transition: all 0.3s;
-        }
-        .sidebar.collapsed {
-            margin-left: -250px;
-        }
-        .main-content {
-            margin-left: 250px;
-            transition: margin-left 0.3s;
-            padding: 20px;
-            width: calc(100% - 250px);
-        }
-        .main-content.expanded {
-            margin-left: 0;
-            width: 100%;
-        }
-        .sidebar a {
-            color: rgba(255,255,255,0.8);
-            text-decoration: none;
-            padding: 10px 15px;
-            display: block;
-            border-left: 4px solid transparent;
-        }
-        .sidebar a:hover, .sidebar a.active {
-            background-color: #495057;
-            color: white;
-            border-left: 4px solid #7c3aed; /* Purple line */
-        }
-        .sidebar .nav-header {
-            padding: 15px;
-            font-size: 1.2rem;
-            border-bottom: 2px solid #7c3aed; /* Purple line */
+            right: 0;
+            z-index: 1030;
+            padding: 0 1rem;
             display: flex;
-            justify-content: space-between;
             align-items: center;
-        }
-        
-        /* Toggle Button Style */
-        .sidebar-toggle {
-            background: #7c3aed;
-            color: white;
-            border: 2px solid #fff;
-            padding: 8px 12px;
-            border-radius: 50%;
-            cursor: pointer;
-            position: fixed;
-            top: 15px;
-            left: 15px;
-            z-index: 110; /* Increased z-index to be above sidebar */
-            display: none; /* Hidden by default, shown when collapsed */
-            box-shadow: 0 4px 8px rgba(124, 58, 237, 0.4);
-            transition: all 0.3s ease;
-        }
-        .sidebar-toggle:hover {
-            background-color: #6d28d9;
-            transform: scale(1.1);
-            box-shadow: 0 6px 12px rgba(124, 58, 237, 0.5);
-        }
-        
-        /* Purple Theme Overrides */
-        .bg-primary {
-            background-color: #7c3aed !important;
-        }
-        .btn-primary {
-            background-color: #7c3aed !important;
-            border-color: #7c3aed !important;
-        }
-        .btn-primary:hover {
-            background-color: #6d28d9 !important;
-            border-color: #6d28d9 !important;
-        }
-        .text-primary {
-            color: #7c3aed !important;
-        }
-        .page-item.active .page-link {
-            background-color: #7c3aed !important;
-            border-color: #7c3aed !important;
+            justify-content: space-between;
         }
 
-        /* Mobile Responsiveness */
-        @media (max-width: 768px) {
-            .sidebar {
-                margin-left: -250px;
-                padding-top: 60px; /* Space for mobile header */
-                z-index: 100;
-            }
-            .sidebar .nav-header {
-                display: none; /* Hide duplicate header in sidebar */
-            }
-            .sidebar.mobile-open {
-                margin-left: 0;
-            }
-            .main-content {
-                margin-left: 0 !important;
-                width: 100% !important;
-                padding-top: 60px; /* Space for toggle button */
-            }
-            .sidebar-toggle {
-                display: block !important;
-            }
-            .sidebar-overlay {
-                display: none;
-                position: fixed;
-                top: 0;
-                left: 0;
-                width: 100%;
-                height: 100%;
-                background: rgba(0,0,0,0.5);
-                z-index: 99;
-                opacity: 0;
-                transition: opacity 0.3s;
-            }
-            .sidebar-overlay.show {
-                 display: block;
-                 opacity: 1;
-             }
-             .mobile-header {
-                 display: flex;
-                 align-items: center;
-                 position: fixed;
-                 top: 0;
-                 left: 0;
-                 width: 100%;
-                 height: 60px;
-                 background-color: #fff;
-                 border-bottom: 1px solid #e0e0e0;
-                 z-index: 102; /* Above sidebar */
-                 padding: 0 15px;
-                 box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-             }
-             .sidebar-toggle {
-                position: static !important; /* Reset fixed positioning */
-                margin: 0 !important;
-                display: block !important;
-            }
-            #desktopToggleBtn {
-                display: none !important;
-            }
+        /* Sidebar */
+        .sidebar {
+            width: var(--sidebar-width);
+            height: 100vh;
+            position: fixed;
+            top: 0;
+            left: 0;
+            background: #212529; /* Darker clean background */
+            color: #fff;
+            z-index: 1040;
+            transition: transform 0.3s ease-in-out;
+            padding-top: var(--header-height);
+            overflow-y: auto;
+            border-right: 1px solid rgba(255,255,255,0.05);
+            /* Hide Scrollbar but keep functionality */
+            scrollbar-width: none; /* Firefox */
+            -ms-overflow-style: none;  /* IE and Edge */
+        }
+        .sidebar::-webkit-scrollbar {
+            display: none; /* Chrome, Safari and Opera */
+        }
+
+        /* Sidebar Header (Logo area inside sidebar) */
+        .sidebar-header {
+            height: var(--header-height);
+            display: flex;
+            align-items: center;
+            padding: 0 1.5rem;
+            position: absolute;
+            top: 0;
+            width: 100%;
+            background: rgba(0,0,0,0.1);
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+
+        /* Sidebar Links */
+        .sidebar .nav-link {
+            color: rgba(255,255,255,0.75);
+            padding: 0.8rem 1.5rem;
+            font-weight: 500;
+            transition: all 0.2s;
+            border-left: 4px solid transparent;
+        }
+        .sidebar .nav-link:hover, .sidebar .nav-link.active {
+            color: #fff;
+            background: rgba(255,255,255,0.05);
+            border-left-color: var(--primary-color);
+        }
+        .sidebar .nav-item-header {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: rgba(255,255,255,0.4);
+            padding: 1.5rem 1.5rem 0.5rem;
+            font-weight: 700;
+        }
+
+        /* Main Content Wrapper */
+        .main-content {
+            margin-left: 0;
+            padding-top: 1.5rem;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            padding-left: 1.5rem;
+            padding-right: 1.5rem;
+        }
+
+        /* Overlay for mobile */
+        .sidebar-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0,0,0,0.5);
+            z-index: 1035;
+            display: none;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        .sidebar-overlay.show {
+            display: block;
+            opacity: 1;
         }
         
+        /* Stylish Toggle Button */
+        .sidebar-toggle {
+            background: transparent;
+            border: none;
+            color: var(--primary-color);
+            font-size: 1.5rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            padding: 0.25rem 0.5rem;
+            border-radius: 0.5rem;
+        }
+        .sidebar-toggle:hover {
+            background-color: rgba(124, 58, 237, 0.1);
+            transform: scale(1.05);
+        }
+
+        /* Purple Theme Utilities */
+        .text-primary {
+            color: var(--primary-color) !important;
+        }
+        .bg-primary {
+            background-color: var(--primary-color) !important;
+        }
+        .btn-primary { 
+            background-color: var(--primary-color) !important; 
+            border-color: var(--primary-color) !important; 
+        }
+        .btn-primary:hover { 
+            background-color: var(--primary-hover) !important; 
+            border-color: var(--primary-hover) !important; 
+        }
         .bg-purple-light {
-            background-color: #a78bfa !important; /* Lighter purple */
+            background-color: #a78bfa !important;
             color: white !important;
+        }
+        .bg-gradient-primary {
+            background: linear-gradient(135deg, var(--primary-color) 0%, #8b5cf6 100%) !important;
+            color: white !important;
+        }
+        .bg-gradient-info {
+            background: linear-gradient(135deg, #3b82f6 0%, #60a5fa 100%) !important;
+            color: white !important;
+        }
+        .bg-gradient-success {
+            background: linear-gradient(135deg, #10b981 0%, #34d399 100%) !important;
+            color: white !important;
+        }
+        .bg-gradient-warning {
+            background: linear-gradient(135deg, #f59e0b 0%, #fbbf24 100%) !important;
+            color: white !important;
+        }
+        .card {
+            border: none;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.03);
+            border-radius: 0.75rem;
+        }
+
+        /* Table Styles */
+        .table thead th {
+            background-color: #f8f9fa;
+            border-bottom: 2px solid #dee2e6;
+            color: #495057;
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 0.8rem;
+            letter-spacing: 0.05em;
+        }
+        .table-hover tbody tr:hover {
+            background-color: rgba(124, 58, 237, 0.05);
+        }
+
+        /* Form Styles */
+        .form-control:focus, .form-select:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 0.25rem rgba(124, 58, 237, 0.25);
+        }
+
+        /* Responsive Logic */
+        .sidebar {
+            transform: translateX(-100%);
+        }
+        .sidebar.show {
+            transform: translateX(0);
         }
     </style>
 </head>
@@ -299,7 +327,7 @@
     
     <div class="container-fluid p-0">
         @auth
-        <div class="mobile-header d-md-none">
+        <div class="mobile-header d-lg-none">
             <button class="sidebar-toggle" id="sidebarToggleBtn" onclick="toggleSidebar()">
                 <i class="bi bi-list"></i>
             </button>
@@ -317,11 +345,8 @@
             <div class="sidebar" id="sidebarMenu">
                 <div class="nav-header">
                     <span><i class="bi bi-building"></i> Okaro & Associates</span>
-                    <button class="btn btn-sm text-white d-md-none" onclick="toggleSidebar()">
+                    <button class="btn btn-sm text-white" onclick="toggleSidebar()">
                         <i class="bi bi-x-lg"></i>
-                    </button>
-                    <button class="btn btn-sm text-white d-none d-md-block" onclick="toggleSidebar()">
-                        <i class="bi bi-chevron-left"></i>
                     </button>
                 </div>
                 <div class="position-sticky pt-3">
@@ -430,8 +455,8 @@
             <main class="@auth main-content @else col-12 @endauth">
                 @auth
                 <!-- Desktop Collapsed Header -->
-                <div id="desktopHeader" class="d-none align-items-center mb-4 pb-2 border-bottom">
-                    <button class="btn btn-primary me-3" onclick="toggleSidebar()">
+                <div id="desktopHeader" class="d-none d-lg-flex align-items-center mb-0 pb-2 border-bottom">
+                    <button class="sidebar-toggle me-3" onclick="toggleSidebar()">
                         <i class="bi bi-list"></i>
                     </button>
                     <span class="h4 mb-0 text-primary fw-bold">Okaro & Associates</span>
@@ -613,31 +638,10 @@
 
         function toggleSidebar() {
             const sidebar = document.getElementById('sidebarMenu');
-            const mainContent = document.querySelector('.main-content');
-            const desktopHeader = document.getElementById('desktopHeader');
             const overlay = document.getElementById('sidebarOverlay');
             
-            if (window.innerWidth <= 768) {
-                // Mobile Logic
-                sidebar.classList.toggle('mobile-open');
-                overlay.classList.toggle('show');
-            } else {
-                // Desktop Logic
-                sidebar.classList.toggle('collapsed');
-                mainContent.classList.toggle('expanded');
-                
-                if (sidebar.classList.contains('collapsed')) {
-                    if(desktopHeader) {
-                        desktopHeader.classList.remove('d-none');
-                        desktopHeader.classList.add('d-flex');
-                    }
-                } else {
-                    if(desktopHeader) {
-                        desktopHeader.classList.remove('d-flex');
-                        desktopHeader.classList.add('d-none');
-                    }
-                }
-            }
+            sidebar.classList.toggle('show');
+            overlay.classList.toggle('show');
         }
 
         /**

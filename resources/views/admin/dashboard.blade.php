@@ -8,61 +8,68 @@
 <!-- Stats Cards -->
 <div class="row mb-4" id="stats-cards">
     <div class="col-md-3">
-        <div class="card text-white bg-purple-light mb-3">
+        <div class="card text-white bg-gradient-primary mb-3 shadow border-0 h-100">
             <div class="card-body">
                 <div class="d-flex justify-content-between align-items-center">
                     <div>
-                        <h5 class="card-title">Total Buildings</h5>
-                        <p class="card-text display-4">{{ $stats['total_buildings'] }}</p>
+                        <h6 class="card-title text-uppercase small opacity-75 fw-bold">Total Buildings</h6>
+                        <p class="card-text display-6 fw-bold mb-0">{{ $stats['total_buildings'] }}</p>
                     </div>
-                    <i class="bi bi-building fs-1"></i>
+                    <div class="bg-white bg-opacity-25 rounded-circle p-3 d-flex align-items-center justify-content-center" style="width: 60px; height: 60px;">
+                        <i class="bi bi-building fs-3"></i>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
     <div class="col-md-3">
-        <div class="card text-white bg-purple-light mb-3">
+        <div class="card text-white bg-gradient-success mb-3 shadow border-0 h-100">
             <div class="card-body">
                 <div class="d-flex justify-content-between align-items-center">
                     <div>
-                        <h5 class="card-title">Active Tenants</h5>
-                        <p class="card-text display-4">{{ $stats['total_tenants'] }}</p>
+                        <h6 class="card-title text-uppercase small opacity-75 fw-bold">Active Tenants</h6>
+                        <p class="card-text display-6 fw-bold mb-0">{{ $stats['total_tenants'] }}</p>
                     </div>
-                    <i class="bi bi-people-fill fs-1"></i>
+                    <div class="bg-white bg-opacity-25 rounded-circle p-3 d-flex align-items-center justify-content-center" style="width: 60px; height: 60px;">
+                        <i class="bi bi-people-fill fs-3"></i>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
     <div class="col-md-3">
-        <div class="card text-white bg-purple-light mb-3">
+        <div class="card text-white bg-gradient-info mb-3 shadow border-0 h-100">
             <div class="card-body">
                 <div class="d-flex justify-content-between align-items-center">
                     <div>
-                        <h5 class="card-title">YTD Revenue</h5>
+                        <h6 class="card-title text-uppercase small opacity-75 fw-bold">YTD Revenue</h6>
                         @php
                             $formattedRevenue = number_format($stats['paid_total'], 0);
                             $revLen = strlen($formattedRevenue);
-                            // Base size display-5 (smaller than display-4), reduces as length increases
-                            $revClass = 'display-5';
-                            if ($revLen > 7) $revClass = 'display-6'; // > 999,999 (millions)
-                            if ($revLen > 10) $revClass = 'fs-2';     // > 99,999,999 (hundred millions)
+                            // Base size display-6, reduces as length increases
+                            $revClass = 'display-6';
+                            if ($revLen > 9) $revClass = 'fs-2';
                         @endphp
-                        <p class="card-text {{ $revClass }}">₦{{ $formattedRevenue }}</p>
+                        <p class="card-text {{ $revClass }} fw-bold mb-0">₦{{ $formattedRevenue }}</p>
                     </div>
-                    <i class="bi bi-cash-stack fs-1"></i>
+                    <div class="bg-white bg-opacity-25 rounded-circle p-3 d-flex align-items-center justify-content-center" style="width: 60px; height: 60px;">
+                        <i class="bi bi-cash-stack fs-3"></i>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
     <div class="col-md-3">
-        <div class="card text-white bg-purple-light mb-3">
+        <div class="card text-white bg-gradient-warning mb-3 shadow border-0 h-100">
             <div class="card-body">
                 <div class="d-flex justify-content-between align-items-center">
                     <div>
-                        <h5 class="card-title">Overdue Rents</h5>
-                        <p class="card-text display-4">{{ $stats['overdue_count'] }}</p>
+                        <h6 class="card-title text-uppercase small opacity-75 fw-bold">Overdue Rents</h6>
+                        <p class="card-text display-6 fw-bold mb-0">{{ $stats['overdue_count'] }}</p>
                     </div>
-                    <i class="bi bi-exclamation-triangle-fill fs-1"></i>
+                    <div class="bg-white bg-opacity-25 rounded-circle p-3 d-flex align-items-center justify-content-center" style="width: 60px; height: 60px;">
+                        <i class="bi bi-exclamation-triangle-fill fs-3"></i>
+                    </div>
                 </div>
             </div>
         </div>
@@ -186,22 +193,78 @@
                 datasets: [{
                     label: 'Revenue Collected (₦)',
                     data: @json($chartData),
-                    backgroundColor: 'rgba(54, 162, 235, 0.2)',
-                    borderColor: 'rgba(54, 162, 235, 1)',
+                    backgroundColor: 'rgba(124, 58, 237, 0.1)',
+                    borderColor: '#7c3aed',
                     borderWidth: 2,
-                    tension: 0.1,
-                    fill: true
+                    tension: 0.3,
+                    fill: true,
+                    pointBackgroundColor: '#fff',
+                    pointBorderColor: '#7c3aed',
+                    pointBorderWidth: 2,
+                    pointRadius: 4,
+                    pointHoverRadius: 6
                 }]
             },
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false
+                    },
+                    tooltip: {
+                        backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                        padding: 12,
+                        titleFont: {
+                            size: 14,
+                            family: "'Nunito', sans-serif"
+                        },
+                        bodyFont: {
+                            size: 13,
+                            family: "'Nunito', sans-serif"
+                        },
+                        displayColors: false,
+                        callbacks: {
+                            label: function(context) {
+                                var label = context.dataset.label || '';
+                                if (label) {
+                                    label += ': ';
+                                }
+                                if (context.parsed.y !== null) {
+                                    label += new Intl.NumberFormat('en-NG', { style: 'currency', currency: 'NGN' }).format(context.parsed.y);
+                                }
+                                return label;
+                            }
+                        }
+                    }
+                },
                 scales: {
                     y: {
                         beginAtZero: true,
+                        grid: {
+                            borderDash: [2, 4],
+                            color: '#f0f0f0',
+                            drawBorder: false
+                        },
                         ticks: {
+                            font: {
+                                family: "'Nunito', sans-serif"
+                            },
                             callback: function(value, index, values) {
+                                if (value >= 1000000) return '₦' + (value/1000000).toFixed(1) + 'M';
+                                if (value >= 1000) return '₦' + (value/1000).toFixed(0) + 'k';
                                 return '₦' + value;
+                            }
+                        }
+                    },
+                    x: {
+                        grid: {
+                            display: false,
+                            drawBorder: false
+                        },
+                        ticks: {
+                            font: {
+                                family: "'Nunito', sans-serif"
                             }
                         }
                     }

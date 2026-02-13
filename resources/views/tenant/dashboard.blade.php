@@ -11,8 +11,8 @@
 <div class="row">
     <!-- Current Lease Info -->
     <div class="col-md-6 mb-4" id="lease-card">
-        <div class="card shadow-sm h-100">
-            <div class="card-header bg-primary text-white">
+        <div class="card shadow-sm border-0 h-100">
+            <div class="card-header bg-gradient-primary text-white">
                 <h5 class="mb-0">My Home</h5>
             </div>
             <div class="card-body">

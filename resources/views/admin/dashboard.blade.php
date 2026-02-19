@@ -1,12 +1,17 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-    <h1 class="h2" id="dashboard-title">{{ Auth::user()->isManager() ? 'Manager Dashboard' : 'Admin Dashboard' }}</h1>
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-2 pb-1 mb-2 mb-md-3 border-bottom">
+    <h1 class="h2 d-none d-md-block" id="dashboard-title">{{ Auth::user()->isManager() ? 'Manager Dashboard' : 'Admin Dashboard' }}</h1>
+    <div class="ms-auto">
+        <button class="btn btn-sm btn-outline-info" onclick="startTour()">
+            <i class="bi bi-question-circle"></i> Help
+        </button>
+    </div>
 </div>
 
 <!-- Stats Cards -->
-<div class="row mb-4" id="stats-cards">
+<div class="row g-2 mb-3 mb-md-4" id="stats-cards">
     <div class="col-md-3">
         <div class="card text-white bg-gradient-primary mb-3 shadow border-0 h-100">
             <div class="card-body">
@@ -76,7 +81,7 @@
     </div>
 </div>
 
-<div class="row mb-4" id="revenue-section">
+<div class="row g-2 mb-3 mb-md-4" id="revenue-section">
     <!-- Revenue Chart -->
     <div class="col-md-12">
         <div class="card shadow-sm">
@@ -90,7 +95,7 @@
     </div>
 </div>
 
-<div class="row">
+<div class="row g-2">
     <!-- Recent Payments -->
     <div class="col-md-6" id="recent-payments-section">
         <div class="card shadow-sm">
@@ -179,6 +184,45 @@
         </div>
     </div>
 </div>
+
+@if(Auth::user()->isManager())
+<div class="row g-2 mt-3" id="manager-announcements-section">
+    <div class="col-md-12">
+        <div class="card shadow-sm">
+            <div class="card-header bg-light">
+                <h5 class="mb-0">Announcements For Your Buildings</h5>
+            </div>
+            <div class="card-body">
+                <ul class="list-group">
+                    @forelse($managerAnnouncements as $ann)
+                        <li class="list-group-item">
+                            <div class="d-flex justify-content-between">
+                                <div>
+                                    <strong>{{ $ann->title }}</strong>
+                                    <div class="text-muted small">
+                                        {{ $ann->created_at->format('M d, Y H:i') }} 
+                                        — {{ $ann->manager->name }} 
+                                        — {{ $ann->building->name }}
+                                    </div>
+                                    <div>{{ $ann->content }}</div>
+                                </div>
+                                <form action="{{ route('buildings.announcements.dismiss', ['building' => $ann->building_id, 'announcement' => $ann->id]) }}" method="POST" onsubmit="return confirm('Remove this announcement from your view only?');">
+                                    @csrf
+                                    <button type="submit" class="btn btn-sm btn-outline-danger">
+                                        <i class="bi bi-x-circle"></i> Remove
+                                    </button>
+                                </form>
+                            </div>
+                        </li>
+                    @empty
+                        <li class="list-group-item text-muted">No announcements yet.</li>
+                    @endforelse
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+@endif
 @endsection
 
 @push('scripts')

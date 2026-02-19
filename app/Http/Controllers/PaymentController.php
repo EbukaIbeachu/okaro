@@ -10,18 +10,28 @@ class PaymentController extends Controller
 {
     public function index()
     {
-        $payments = Payment::with(['rent.tenant', 'rent.unit.building', 'creator'])
-            ->latest('payment_date')
-            ->paginate(20);
+        $query = Payment::with(['rent.tenant', 'rent.unit.building', 'creator'])->latest('payment_date');
+        if (auth()->user()->isManager()) {
+            $query->whereHas('rent.unit.building', function ($q) {
+                $q->where('manager_id', auth()->id());
+            });
+        }
+        $payments = $query->paginate(20);
         return view('payments.index', compact('payments'));
     }
 
     public function create(Request $request)
     {
         $rentId = $request->query('rent_id');
-        $rents = Rent::with(['tenant', 'unit.building', 'payments'])->whereHas('tenant', function($q) {
+        $rentsQuery = Rent::with(['tenant', 'unit.building', 'payments'])->whereHas('tenant', function($q) {
             $q->where('active', true);
-        })->get();
+        });
+        if (auth()->user()->isManager()) {
+            $rentsQuery->whereHas('unit.building', function ($q) {
+                $q->where('manager_id', auth()->id());
+            });
+        }
+        $rents = $rentsQuery->get();
         
         $selectedRent = $rentId ? Rent::with('payments')->find($rentId) : null;
 
@@ -40,6 +50,11 @@ class PaymentController extends Controller
 
         // Automatically set due_date to match the end of the lease date
         $rent = Rent::find($validated['rent_id']);
+        if (auth()->user()->isManager()) {
+            if (!$rent || !$rent->unit || !$rent->unit->building || $rent->unit->building->manager_id !== auth()->id()) {
+                abort(403, 'Unauthorized action.');
+            }
+        }
         if ($rent && $rent->end_date) {
             $validated['due_date'] = $rent->end_date;
         }

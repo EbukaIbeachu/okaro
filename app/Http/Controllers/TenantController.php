@@ -22,7 +22,13 @@ class TenantController extends Controller
 
     public function index()
     {
-        $tenants = Tenant::with(['unit.building', 'user', 'creator'])->paginate(15);
+        $query = Tenant::with(['unit.building', 'user', 'creator']);
+        if (auth()->user()->isManager()) {
+            $query->whereHas('unit.building', function ($q) {
+                $q->where('manager_id', auth()->id());
+            });
+        }
+        $tenants = $query->paginate(15);
         return view('tenants.index', compact('tenants'));
     }
 
@@ -120,6 +126,12 @@ class TenantController extends Controller
     public function show(Tenant $tenant)
     {
         $tenant->load(['unit.building', 'rents', 'payments']);
+        if (auth()->user()->isManager()) {
+            $buildingManagerId = optional(optional($tenant->unit)->building)->manager_id;
+            if ($buildingManagerId !== auth()->id()) {
+                abort(403, 'Unauthorized action.');
+            }
+        }
         return view('tenants.show', compact('tenant'));
     }
 

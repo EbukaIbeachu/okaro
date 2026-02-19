@@ -18,6 +18,7 @@ class Building extends Model
         'state',
         'postal_code',
         'image_path',
+        'manager_id',
         'total_units',
         'total_floors',
         'created_by',
@@ -41,6 +42,11 @@ class Building extends Model
     public function tenants()
     {
         return $this->hasManyThrough(Tenant::class, Unit::class);
+    }
+
+    public function manager()
+    {
+        return $this->belongsTo(User::class, 'manager_id');
     }
 
     public function rents()

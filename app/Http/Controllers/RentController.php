@@ -19,6 +19,12 @@ class RentController extends Controller
             $query->where('status', $status);
         }
 
+        if (auth()->user()->isManager()) {
+            $query->whereHas('unit.building', function ($q) {
+                $q->where('manager_id', auth()->id());
+            });
+        }
+
         $rents = $query->paginate(15);
         return view('rents.index', compact('rents', 'status'));
     }
@@ -86,12 +92,16 @@ class RentController extends Controller
     {
         $rent->load(['tenant', 'unit.building', 'payments']);
         
-        // Authorization: Admin/Manager or the specific Tenant
         $user = auth()->user();
-        if (!$user->isAdmin() && !$user->isManager()) {
-             if (!$rent->tenant || $rent->tenant->user_id !== $user->id) {
-                 abort(403, 'Unauthorized action.');
-             }
+        if ($user->isAdmin()) {
+        } elseif ($user->isManager()) {
+            if (!$rent->unit || !$rent->unit->building || $rent->unit->building->manager_id !== $user->id) {
+                abort(403, 'Unauthorized action.');
+            }
+        } else {
+            if (!$rent->tenant || $rent->tenant->user_id !== $user->id) {
+                abort(403, 'Unauthorized action.');
+            }
         }
 
         return view('rents.show', compact('rent'));
@@ -180,12 +190,16 @@ class RentController extends Controller
     {
         $rent->load(['tenant', 'unit.building']);
 
-        // Authorization: Admin/Manager or the specific Tenant
         $user = auth()->user();
-        if (!$user->isAdmin() && !$user->isManager()) {
-             if (!$rent->tenant || $rent->tenant->user_id !== $user->id) {
-                 abort(403, 'Unauthorized action.');
-             }
+        if ($user->isAdmin()) {
+        } elseif ($user->isManager()) {
+            if (!$rent->unit || !$rent->unit->building || $rent->unit->building->manager_id !== $user->id) {
+                abort(403, 'Unauthorized action.');
+            }
+        } else {
+            if (!$rent->tenant || $rent->tenant->user_id !== $user->id) {
+                abort(403, 'Unauthorized action.');
+            }
         }
 
         return view('rents.agreement', compact('rent'));
@@ -193,12 +207,16 @@ class RentController extends Controller
 
     public function uploadAgreement(Request $request, Rent $rent)
     {
-        // Authorization: Admin/Manager or the specific Tenant
         $user = auth()->user();
-        if (!$user->isAdmin() && !$user->isManager()) {
-             if (!$rent->tenant || $rent->tenant->user_id !== $user->id) {
-                 abort(403, 'Unauthorized action.');
-             }
+        if ($user->isAdmin()) {
+        } elseif ($user->isManager()) {
+            if (!$rent->unit || !$rent->unit->building || $rent->unit->building->manager_id !== $user->id) {
+                abort(403, 'Unauthorized action.');
+            }
+        } else {
+            if (!$rent->tenant || $rent->tenant->user_id !== $user->id) {
+                abort(403, 'Unauthorized action.');
+            }
         }
 
         $request->validate([
@@ -222,12 +240,16 @@ class RentController extends Controller
 
     public function downloadAgreement(Rent $rent)
     {
-        // Authorization: Admin/Manager or the specific Tenant
         $user = auth()->user();
-        if (!$user->isAdmin() && !$user->isManager()) {
-             if (!$rent->tenant || $rent->tenant->user_id !== $user->id) {
-                 abort(403, 'Unauthorized action.');
-             }
+        if ($user->isAdmin()) {
+        } elseif ($user->isManager()) {
+            if (!$rent->unit || !$rent->unit->building || $rent->unit->building->manager_id !== $user->id) {
+                abort(403, 'Unauthorized action.');
+            }
+        } else {
+            if (!$rent->tenant || $rent->tenant->user_id !== $user->id) {
+                abort(403, 'Unauthorized action.');
+            }
         }
 
         if (!$rent->signed_agreement_path || !\Illuminate\Support\Facades\Storage::disk('public')->exists($rent->signed_agreement_path)) {

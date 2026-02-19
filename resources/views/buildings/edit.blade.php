@@ -104,6 +104,23 @@
                         </div>
                     </div>
 
+                    @if(Auth::user()->isAdmin())
+                    <div class="mb-3">
+                        <label for="manager_id" class="form-label">Assigned Manager</label>
+                        <select class="form-select @error('manager_id') is-invalid @enderror" id="manager_id" name="manager_id">
+                            <option value="">None</option>
+                            @foreach($managers as $manager)
+                                <option value="{{ $manager->id }}" {{ old('manager_id', $building->manager_id) == $manager->id ? 'selected' : '' }}>
+                                    {{ $manager->name }} ({{ $manager->email }})
+                                </option>
+                            @endforeach
+                        </select>
+                        @error('manager_id')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                    </div>
+                    @endif
+
                     <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-4">
                         <button type="submit" class="btn btn-primary">Update Building</button>
                     </div>

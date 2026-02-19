@@ -90,6 +90,13 @@
                                 <p class="text-muted mb-2 building-address">
                                     <i class="bi bi-geo-alt me-1"></i> {{ $building->address }}
                                 </p>
+                                <div class="mb-2">
+                                    @if($building->manager)
+                                        <span class="badge bg-secondary"><i class="bi bi-person-badge me-1"></i> Manager: {{ $building->manager->name }}</span>
+                                    @else
+                                        <span class="badge bg-secondary"><i class="bi bi-person-badge me-1"></i> Manager: Unassigned</span>
+                                    @endif
+                                </div>
                                 @if(auth()->user()->isAdmin() && $building->creator)
                                     <div class="mb-2 text-muted small d-none d-md-block">
                                         <i class="bi bi-person-check me-1"></i> Registered by: {{ $building->creator->name }}
@@ -115,6 +122,61 @@
             </div>
         </div>
     </div>
+
+    @php
+        $canPostAnnouncement = Auth::user()->isAdmin() || (Auth::user()->isManager() && $building->manager_id === Auth::id());
+        $isTenantOfBuilding = Auth::user()->isTenant() && optional(optional(Auth::user()->tenant)->unit)->building_id === $building->id;
+    @endphp
+    @if($canPostAnnouncement || $isTenantOfBuilding)
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-white">
+                    <h5 class="mb-0"><i class="bi bi-megaphone me-1"></i> Announcements</h5>
+                </div>
+                <div class="card-body">
+                    @if($canPostAnnouncement)
+                        <form action="{{ route('buildings.announce', $building) }}" method="POST" class="mb-3">
+                            @csrf
+                            <div class="row g-2">
+                                <div class="col-md-4">
+                                    <input type="text" name="title" class="form-control" placeholder="Title" required maxlength="150">
+                                </div>
+                                <div class="col-md-6">
+                                    <input type="text" name="content" class="form-control" placeholder="Message to tenants..." required maxlength="5000">
+                                </div>
+                                <div class="col-md-2 d-grid">
+                                    <button type="submit" class="btn btn-primary"><i class="bi bi-send"></i> Post</button>
+                                </div>
+                            </div>
+                        </form>
+                    @endif
+                    <ul class="list-group">
+                        @forelse($announcements as $ann)
+                            <li class="list-group-item">
+                                <div class="d-flex justify-content-between">
+                                    <div>
+                                        <strong>{{ $ann->title }}</strong>
+                                        <div class="text-muted small">{{ $ann->created_at->format('M d, Y H:i') }} — {{ $ann->manager->name }}</div>
+                                        <div>{{ $ann->content }}</div>
+                                    </div>
+                                    <form action="{{ route('buildings.announcements.dismiss', ['building' => $building->id, 'announcement' => $ann->id]) }}" method="POST" onsubmit="return confirm('Remove this announcement from your view only?');">
+                                        @csrf
+                                        <button type="submit" class="btn btn-sm btn-outline-danger">
+                                            <i class="bi bi-x-circle"></i> Remove
+                                        </button>
+                                    </form>
+                                </div>
+                            </li>
+                        @empty
+                            <li class="list-group-item text-muted">No announcements yet.</li>
+                        @endforelse
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+    @endif
 
     <!-- Quick Stats Row -->
     <div class="row g-3 mb-4">

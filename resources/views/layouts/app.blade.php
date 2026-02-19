@@ -172,7 +172,7 @@
             color: #fff;
             z-index: 1040;
             transition: transform 0.3s ease-in-out;
-            padding-top: var(--header-height);
+            padding-top: 0;
             overflow-y: auto;
             border-right: 1px solid rgba(255,255,255,0.05);
             /* Hide Scrollbar but keep functionality */
@@ -183,17 +183,14 @@
             display: none; /* Chrome, Safari and Opera */
         }
 
-        /* Sidebar Header (Logo area inside sidebar) */
-        .sidebar-header {
-            height: var(--header-height);
+        .nav-header {
             display: flex;
             align-items: center;
-            padding: 0 1.5rem;
-            position: absolute;
-            top: 0;
-            width: 100%;
-            background: rgba(0,0,0,0.1);
-            border-bottom: 1px solid rgba(255,255,255,0.05);
+            justify-content: space-between;
+            padding: 0.5rem 1rem;
+            background: rgba(0,0,0,0.2);
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+            z-index: 1;
         }
 
         /* Sidebar Links */
@@ -214,8 +211,14 @@
             text-transform: uppercase;
             letter-spacing: 0.05em;
             color: rgba(255,255,255,0.4);
-            padding: 1.5rem 1.5rem 0.5rem;
+            padding: 0.75rem 1rem 0.5rem;
             font-weight: 700;
+        }
+
+        .sidebar-user {
+            position: sticky;
+            bottom: 0;
+            background: #212529;
         }
 
         /* Main Content Wrapper */
@@ -345,15 +348,19 @@
         }
         .ripple {
             position: absolute;
-            background: rgba(255, 255, 255, 0.4);
+            background: rgba(255, 255, 255, 0.5);
             border-radius: 50%;
             transform: scale(0);
-            animation: ripple-animation 0.6s linear;
+            animation: ripple-animation 0.8s ease-out;
             pointer-events: none;
         }
         @keyframes ripple-animation {
-            to {
-                transform: scale(4);
+            0% {
+                transform: scale(0.5);
+                opacity: 0.9;
+            }
+            100% {
+                transform: scale(6);
                 opacity: 0;
             }
         }
@@ -361,10 +368,10 @@
             position: absolute;
             color: #ffd700;
             font-weight: bold;
-            font-size: 1.2rem;
+            font-size: 1.3rem;
             pointer-events: none;
-            animation: float-up 1s ease-out forwards;
-            text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+            animation: float-up 1.3s ease-out forwards;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.6);
             z-index: 1000;
         }
         @keyframes float-up {
@@ -373,7 +380,7 @@
                 opacity: 1;
             }
             100% {
-                transform: translateY(-50px) scale(1.5);
+                transform: translateY(-70px) scale(1.6);
                 opacity: 0;
             }
         }
@@ -406,7 +413,7 @@
                         <i class="bi bi-x-lg"></i>
                     </button>
                 </div>
-                <div class="position-sticky pt-3">
+                <div class="pt-3">
                     <ul class="nav flex-column">
                         <li class="nav-item">
                             <a class="nav-link" href="{{ url('/') }}">
@@ -487,7 +494,7 @@
                     </ul>
 
                     <hr class="text-white">
-                    <div class="px-3 pb-3">
+                    <div class="px-3 pb-3 sidebar-user">
                         <div class="d-flex align-items-center mb-2">
                             <div class="flex-shrink-0">
                                 <i class="bi bi-person-circle fs-4"></i>
@@ -518,8 +525,15 @@
                     </button>
                     <span class="h4 mb-0 text-primary fw-bold">Okaro & Associates</span>
                     
-                    <!-- Coin Wallet Display -->
-                    <div class="ms-auto d-flex align-items-center bg-white border rounded-pill px-3 py-1 shadow-sm">
+                    @if(isset($globalAnnouncementCount) && $globalAnnouncementCount > 0)
+                        <div class="ms-auto me-3 d-flex align-items-center">
+                            <span class="badge rounded-pill bg-danger announcement-badge">
+                                <i class="bi bi-megaphone-fill me-1"></i>{{ $globalAnnouncementCount }}
+                            </span>
+                        </div>
+                    @endif
+
+                    <div class="d-flex align-items-center bg-white border rounded-pill px-3 py-1 shadow-sm">
                         <i class="bi bi-coin text-warning fs-5 me-2"></i>
                         <span id="coin-wallet-desktop" class="fw-bold text-dark">0.00</span>
                     </div>
@@ -527,11 +541,17 @@
 
                 <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom d-md-none">
                     <h1 class="h2 text-primary fw-bold">{{ Auth::user()->isAdmin() ? 'Admin' : (Auth::user()->isManager() ? 'Manager' : 'Tenant') }}</h1>
-                    
-                    <!-- Mobile Coin Wallet Display -->
-                    <div class="d-flex align-items-center bg-white border rounded-pill px-3 py-1 shadow-sm ms-auto">
-                        <i class="bi bi-coin text-warning fs-5 me-2"></i>
-                        <span id="coin-wallet-mobile" class="fw-bold text-dark">0.00</span>
+
+                    <div class="d-flex align-items-center ms-auto">
+                        @if(isset($globalAnnouncementCount) && $globalAnnouncementCount > 0)
+                            <span class="badge rounded-pill bg-danger me-2 announcement-badge">
+                                <i class="bi bi-megaphone-fill me-1"></i>{{ $globalAnnouncementCount }}
+                            </span>
+                        @endif
+                        <div class="d-flex align-items-center bg-white border rounded-pill px-3 py-1 shadow-sm">
+                            <i class="bi bi-coin text-warning fs-5 me-2"></i>
+                            <span id="coin-wallet-mobile" class="fw-bold text-dark">0.00</span>
+                        </div>
                     </div>
                 </div>
                 @endauth
@@ -588,24 +608,32 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/driver.js@1.0.1/dist/driver.js.iife.js"></script>
     <script>
-        // Clicker Game Logic
         document.addEventListener('DOMContentLoaded', function() {
             let coins = parseFloat(localStorage.getItem('okaro_coins') || '0');
+            let tapCount = parseInt(localStorage.getItem('okaro_taps') || '0');
             const walletDisplayDesktop = document.getElementById('coin-wallet-desktop');
             const walletDisplayMobile = document.getElementById('coin-wallet-mobile');
-            
-            // Initialize Display
+            const upliftPhrases = [
+                'You are doing great',
+                'Every tap moves you forward',
+                'Keep going, you are growing',
+                'Small steps, big progress',
+                'Your effort matters',
+                'You are building something strong'
+            ];
+            let currentPhraseIndex = 0;
+            let lastTapTime = Date.now();
+            const tapPauseThreshold = 1500;
+
             updateWalletDisplay();
 
-            // Make all cards interactive
-            const cards = document.querySelectorAll('.card');
-            cards.forEach(card => {
-                card.classList.add('interactive');
-                card.addEventListener('click', handleCardClick);
+            const tapElements = document.querySelectorAll('.card, .modal-content');
+            tapElements.forEach(element => {
+                element.classList.add('interactive');
+                element.addEventListener('click', handleCardClick);
             });
 
             function handleCardClick(e) {
-                // Determine increment value based on thresholds
                 let increment = 0.25;
                 if (coins >= 1000) {
                     increment = 1.0;
@@ -613,12 +641,18 @@
                     increment = 0.5;
                 }
 
-                // Update State
+                const now = Date.now();
+                if (now - lastTapTime > tapPauseThreshold) {
+                    currentPhraseIndex = (currentPhraseIndex + 1) % upliftPhrases.length;
+                }
+                lastTapTime = now;
+
                 coins += increment;
+                tapCount += 1;
                 localStorage.setItem('okaro_coins', coins.toString());
+                localStorage.setItem('okaro_taps', tapCount.toString());
                 updateWalletDisplay();
 
-                // Trigger Visuals
                 createRipple(e, this);
                 createFloatingText(e, increment);
             }
@@ -654,16 +688,12 @@
 
             function createFloatingText(event, amount) {
                 const text = document.createElement('div');
-                text.textContent = '+' + amount.toFixed(2);
+                text.textContent = '+' + amount.toFixed(2) + ' • ' + upliftPhrases[currentPhraseIndex];
                 text.classList.add('floating-text');
-                
-                // Position at click coordinates relative to viewport to avoid overflow issues
                 text.style.left = `${event.clientX}px`;
                 text.style.top = `${event.clientY}px`;
-                
-                document.body.appendChild(text); // Append to body to float freely
+                document.body.appendChild(text);
 
-                // Clean up after animation
                 setTimeout(() => {
                     text.remove();
                 }, 1000);
@@ -677,14 +707,26 @@
                 
                 const userRole = "{{ Auth::check() ? (Auth::user()->isAdmin() ? 'admin' : (Auth::user()->isManager() ? 'manager' : 'tenant')) : 'guest' }}";
                 const currentRoute = "{{ Route::currentRouteName() }}";
+                const isMobile = window.matchMedia('(max-width: 768px)').matches;
                 
                 let steps = [];
 
-                // Common Steps (Navigation)
-                const commonSteps = [
-                    { element: '#sidebarMenu', popover: { title: 'Navigation', description: 'Use this sidebar to access different sections of the application.', side: 'right' } },
-                    { element: '.bi-person-circle', popover: { title: 'User Profile', description: 'View your profile info here.', side: 'bottom' } },
-                ];
+                const commonSteps = isMobile
+                    ? [
+                        { element: '.mobile-header', popover: { title: 'Header', description: 'Open the sidebar using the menu button.', side: 'bottom' } },
+                        { element: '#sidebarToggleBtn', popover: { title: 'Menu', description: 'Tap to open app navigation.', side: 'bottom' } },
+                        { element: '.announcement-badge', popover: { title: 'Announcements', description: 'See new notices for your properties or tenancy.', side: 'bottom' } },
+                        { element: '#coin-wallet-mobile', popover: { title: 'Coin Wallet', description: 'Your engagement coins appear here as you interact.', side: 'bottom' } },
+                        { element: '#chatbot-toggle', popover: { title: 'AI Assistant', description: 'Chat with the Okaro assistant for guidance.', side: 'top' } },
+                        { element: '.bi-person-circle', popover: { title: 'Profile', description: 'View your profile info here.', side: 'top' } },
+                      ]
+                    : [
+                        { element: '#sidebarMenu', popover: { title: 'Navigation', description: 'Use this sidebar to access different sections of the application.', side: 'right' } },
+                        { element: '.announcement-badge', popover: { title: 'Announcements', description: 'Unread announcements for your role are highlighted here.', side: 'bottom' } },
+                        { element: '#coin-wallet-desktop', popover: { title: 'Coin Wallet', description: 'Track your engagement coins as you tap and explore.', side: 'bottom' } },
+                        { element: '#chatbot-toggle', popover: { title: 'AI Assistant', description: 'Open the Okaro assistant to ask questions anytime.', side: 'top' } },
+                        { element: '.bi-person-circle', popover: { title: 'User Profile', description: 'View your profile info here.', side: 'top' } },
+                      ];
 
                 // Page-Specific Steps Definition
                 const pageSteps = {
@@ -737,28 +779,52 @@
                 } else if (currentRoute === 'dashboard') {
                     // Dashboard specific logic
                     if (userRole === 'admin') {
-                        steps = [
-                            { element: '#dashboard-title', popover: { title: 'Admin Dashboard', description: 'Welcome to your command center. You have full control over the system here.', side: 'bottom' } },
-                            { element: '#stats-cards', popover: { title: 'Quick Stats', description: 'Real-time overview of properties, tenants, and financials.', side: 'bottom' } },
-                            { element: '#revenue-section', popover: { title: 'Revenue Tracking', description: 'Monitor monthly income performance at a glance.', side: 'top' } },
-                            { element: '#recent-payments-section', popover: { title: 'Recent Activity', description: 'See the latest payments as they come in.', side: 'right' } },
-                            { element: '#overdue-rents-section', popover: { title: 'Attention Needed', description: 'Track overdue payments and take action.', side: 'left' } },
-                            ...commonSteps
-                        ];
+                        steps = isMobile
+                            ? [
+                                { element: '#stats-cards', popover: { title: 'Quick Stats', description: 'Overview of properties, tenants, and revenue.', side: 'bottom' } },
+                                { element: '#revenue-section', popover: { title: 'Revenue', description: 'Monthly performance at a glance.', side: 'top' } },
+                                { element: '#recent-payments-section', popover: { title: 'Recent Payments', description: 'Latest transactions.', side: 'bottom' } },
+                                { element: '#overdue-rents-section', popover: { title: 'Overdue', description: 'Accounts needing attention.', side: 'bottom' } },
+                                ...commonSteps
+                              ]
+                            : [
+                                { element: '#dashboard-title', popover: { title: 'Admin Dashboard', description: 'Central control for administration.', side: 'bottom' } },
+                                { element: '#stats-cards', popover: { title: 'Quick Stats', description: 'Real-time overview.', side: 'bottom' } },
+                                { element: '#revenue-section', popover: { title: 'Revenue Tracking', description: 'Monitor income performance.', side: 'top' } },
+                                { element: '#recent-payments-section', popover: { title: 'Recent Activity', description: 'Latest payments.', side: 'right' } },
+                                { element: '#overdue-rents-section', popover: { title: 'Attention Needed', description: 'Track overdue accounts.', side: 'left' } },
+                                ...commonSteps
+                              ];
                     } else if (userRole === 'manager') {
-                        steps = [
-                            { element: '#dashboard-title', popover: { title: 'Manager Dashboard', description: 'Welcome! Manage your day-to-day operations here.', side: 'bottom' } },
-                            { element: '#stats-cards', popover: { title: 'Overview', description: 'Check the status of your assigned units and tenants.', side: 'bottom' } },
-                            { element: '#overdue-rents-section', popover: { title: 'Collections', description: 'Focus on these overdue accounts.', side: 'left' } },
-                            ...commonSteps
-                        ];
+                        steps = isMobile
+                            ? [
+                                { element: '#stats-cards', popover: { title: 'Overview', description: 'Status of units and tenants.', side: 'bottom' } },
+                                { element: '#overdue-rents-section', popover: { title: 'Collections', description: 'Focus on overdue accounts.', side: 'bottom' } },
+                                { element: '#manager-announcements-section', popover: { title: 'Announcements', description: 'Updates for the buildings you manage.', side: 'bottom' } },
+                                ...commonSteps
+                              ]
+                            : [
+                                { element: '#dashboard-title', popover: { title: 'Manager Dashboard', description: 'Manage operations.', side: 'bottom' } },
+                                { element: '#stats-cards', popover: { title: 'Overview', description: 'Units and tenants.', side: 'bottom' } },
+                                { element: '#overdue-rents-section', popover: { title: 'Collections', description: 'Overdue accounts.', side: 'left' } },
+                                { element: '#manager-announcements-section', popover: { title: 'Announcements', description: 'Building communications from admins and managers.', side: 'left' } },
+                                ...commonSteps
+                              ];
                     } else if (userRole === 'tenant') {
-                         steps = [
-                            { element: '#dashboard-title', popover: { title: 'Tenant Portal', description: 'Welcome home! This is your personal dashboard.', side: 'bottom' } },
-                            { element: '#lease-card', popover: { title: 'Lease Details', description: 'View your rent amount, due dates, and unit info.', side: 'right' } },
-                            { element: '#payment-history', popover: { title: 'Payment History', description: 'Track your past payments and download receipts.', side: 'left' } },
-                            ...commonSteps
-                        ];
+                        steps = isMobile
+                            ? [
+                                { element: '#lease-card', popover: { title: 'Lease', description: 'Rent amount and due dates.', side: 'bottom' } },
+                                { element: '#payment-history', popover: { title: 'Payments', description: 'Past payments and receipts.', side: 'bottom' } },
+                                { element: '#announcements', popover: { title: 'Announcements', description: 'Building messages from your landlord or manager.', side: 'bottom' } },
+                                ...commonSteps
+                              ]
+                            : [
+                                { element: '#dashboard-title', popover: { title: 'Tenant Portal', description: 'Your personal dashboard.', side: 'bottom' } },
+                                { element: '#lease-card', popover: { title: 'Lease Details', description: 'Rent and unit info.', side: 'right' } },
+                                { element: '#payment-history', popover: { title: 'Payment History', description: 'Receipts and records.', side: 'left' } },
+                                { element: '#announcements', popover: { title: 'Announcements', description: 'Important updates for your tenancy.', side: 'bottom' } },
+                                ...commonSteps
+                              ];
                     }
                 }
 

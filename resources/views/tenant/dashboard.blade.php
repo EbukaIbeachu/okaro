@@ -97,4 +97,37 @@
         </div>
     </div>
 </div>
+
+<div class="row">
+    <div class="col-12 mb-4" id="announcements">
+        <div class="card shadow-sm border-0">
+            <div class="card-header bg-white">
+                <h5 class="mb-0"><i class="bi bi-megaphone me-1"></i> Announcements</h5>
+            </div>
+            <div class="card-body">
+                <ul class="list-group">
+                    @forelse($announcements as $ann)
+                        <li class="list-group-item">
+                            <div class="d-flex justify-content-between">
+                                <div>
+                                    <strong>{{ $ann->title }}</strong>
+                                    <div class="text-muted small">{{ $ann->created_at->format('M d, Y H:i') }}</div>
+                                    <div>{{ $ann->content }}</div>
+                                </div>
+                                <form action="{{ route('buildings.announcements.dismiss', ['building' => $rent ? $rent->unit->building_id : optional(optional($tenant->unit))->building_id, 'announcement' => $ann->id]) }}" method="POST" onsubmit="return confirm('Remove this announcement from your page?');">
+                                    @csrf
+                                    <button type="submit" class="btn btn-sm btn-outline-danger">
+                                        <i class="bi bi-x-circle"></i> Remove
+                                    </button>
+                                </form>
+                            </div>
+                        </li>
+                    @empty
+                        <li class="list-group-item text-muted">No announcements yet.</li>
+                    @endforelse
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
 @endsection

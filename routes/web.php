@@ -155,6 +155,14 @@ Route::get('/chatbot/status', function () {
 // Authentication Routes
 Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
 Route::post('/login', [AuthController::class, 'login']);
+Route::get('/logout', function () {
+    if (auth()->check()) {
+        auth()->logout();
+        request()->session()->invalidate();
+        request()->session()->regenerateToken();
+    }
+    return redirect()->route('login');
+});
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
 // Registration Routes
@@ -184,6 +192,9 @@ Route::middleware(['auth'])->group(function () {
     Route::resource('users', UserController::class);
     Route::resource('roles', RoleController::class);
     Route::resource('buildings', BuildingController::class);
+    Route::post('buildings/{building}/announce', [BuildingController::class, 'announce'])->name('buildings.announce');
+    Route::post('buildings/{building}/announcements/{announcement}/dismiss', [BuildingController::class, 'dismissAnnouncement'])->name('buildings.announcements.dismiss');
+    Route::delete('buildings/{building}/announcements/{announcement}', [BuildingController::class, 'destroyAnnouncement'])->name('buildings.announcements.destroy');
     Route::resource('units', UnitController::class);
     Route::resource('tenants', TenantController::class);
     Route::resource('rents', RentController::class);
